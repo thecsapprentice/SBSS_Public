@@ -31,7 +31,7 @@ public:
 #ifndef DEBUG_NONMIXED
        return BASE::Deviatoric_P_hat(Sigma,mu)+alpha*p*Q_hat;
 #else
-       return BASE::Deviatoric_P_hat(Sigma,mu)+(kappa*M(Sigma))*Q_hat;
+       return BASE::Deviatoric_P_hat(Sigma,mu)+(kappa*MATERIAL_MODEL::M(Sigma))*Q_hat;
 #endif
     }
 

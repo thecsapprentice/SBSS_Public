@@ -153,14 +153,14 @@ Add_Force_Differential(const T_STATE& state_u,T_STATE& state_f) const
 #endif
     
 #ifdef USE_SPECIALIZED_KERNELS
-    NONLINEAR_ELASTICITY<T,d>::template Add_Force_Differential_Elasticity_Specialized<false,enable_muscles>(View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
+    NONLINEAR_ELASTICITY<T,d>::template Add_Force_Differential_Elasticity_Specialized<false,enable_muscles>(BASE::View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
 #else
     NONLINEAR_ELASTICITY<T,d>::Add_Force_Differential(state_u,state_f);
-    Add_Force_Differential_Muscles(View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
+    Add_Force_Differential_Muscles(BASE::View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
 #endif
-    Add_Force_Differential_Constraints(dynamic_point_constraints,View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
-    Add_Force_Differential_Constraints(static_point_constraints,View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
-    Add_Force_Differential_Constraints(collision_constraints,View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
+    Add_Force_Differential_Constraints(dynamic_point_constraints,BASE::View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
+    Add_Force_Differential_Constraints(static_point_constraints,BASE::View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
+    Add_Force_Differential_Constraints(collision_constraints,BASE::View_Convert(state_u.x),state_u.p,state_f.x,state_f.p);
 
 }
 //#####################################################################
@@ -171,7 +171,7 @@ Initialize_Undeformed_Configuration(T_STATE& state)
 {
     for(RANGE_ITERATOR<d> iterator(unpadded_node_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& index=iterator.Index();
-        if(node_is_active(index) || node_is_dirichlet(index))
+        if(this->node_is_active(index) || this->node_is_dirichlet(index))
             for(int v=1;v<=d;v++)
                 state.x(v)(index)=T(0);
     }
@@ -241,7 +241,7 @@ Add_Embedded_Point_To_Fixed_Point_Spring_Constraint(const T spring_coefficient,c
     T_INDEX cell_index=grid.Cell(embedded_point_material_space_location,0);
     PHYSBAM_ASSERT(unpadded_cell_domain.Lazy_Inside(cell_index));
 
-    if(cell_type(cell_index)!=INTERIOR_CELL_TYPE && cell_type(cell_index)!=DIRICHLET_CELL_TYPE && cell_type(cell_index)!=BOUNDARY_CELL_TYPE){
+    if(this->cell_type(cell_index)!=INTERIOR_CELL_TYPE && this->cell_type(cell_index)!=DIRICHLET_CELL_TYPE && this->cell_type(cell_index)!=BOUNDARY_CELL_TYPE){
 
         int new_constraint_index=(*point_constraints).Append(CONSTRAINT_SEGMENT<T,d>());
         CONSTRAINT_SEGMENT<T,d>& new_constraint=(*point_constraints)(new_constraint_index);
@@ -288,13 +288,13 @@ Add_Two_Embedded_Point_Spring_Constraint(const T spring_coefficient,const TV& em
 
     T_INDEX cell_index1=grid.Cell(embedded_point_material_space_location1,0);
     PHYSBAM_ASSERT(unpadded_cell_domain.Lazy_Inside(cell_index1));
-    PHYSBAM_ASSERT(cell_type(cell_index1)==INTERIOR_CELL_TYPE || cell_type(cell_index1)==DIRICHLET_CELL_TYPE || cell_type(cell_index1)==BOUNDARY_CELL_TYPE);
+    PHYSBAM_ASSERT(this->cell_type(cell_index1)==INTERIOR_CELL_TYPE || this->cell_type(cell_index1)==DIRICHLET_CELL_TYPE || this->cell_type(cell_index1)==BOUNDARY_CELL_TYPE);
     TV multilinear_coordinates1=(embedded_point_material_space_location1-grid.Node(cell_index1))/h;
     PHYSBAM_ASSERT(multilinear_coordinates1.Min()>-1e-4 && multilinear_coordinates1.Max()<1+1e-4);
 
     T_INDEX cell_index2=grid.Cell(embedded_point_material_space_location2,0);
     PHYSBAM_ASSERT(unpadded_cell_domain.Lazy_Inside(cell_index2));
-    PHYSBAM_ASSERT(cell_type(cell_index2)==INTERIOR_CELL_TYPE || cell_type(cell_index2)==DIRICHLET_CELL_TYPE || cell_type(cell_index2)==BOUNDARY_CELL_TYPE);
+    PHYSBAM_ASSERT(this->cell_type(cell_index2)==INTERIOR_CELL_TYPE || this->cell_type(cell_index2)==DIRICHLET_CELL_TYPE || this->cell_type(cell_index2)==BOUNDARY_CELL_TYPE);
     TV multilinear_coordinates2=(embedded_point_material_space_location2-grid.Node(cell_index2))/h;
     PHYSBAM_ASSERT(multilinear_coordinates2.Min()>-1e-4 && multilinear_coordinates2.Max()<1+1e-4);
 

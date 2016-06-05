@@ -1,0 +1,17 @@
+bmesh.o: bmesh.cpp bmesh.h
+element_cycle.o: element_cycle.cpp bmesh.h
+disk_cycle.o: disk_cycle.cpp bmesh.h
+loop_cycle.o: loop_cycle.cpp bmesh.h
+radial_cycle.o: radial_cycle.cpp bmesh.h
+elements.o: elements.cpp bmesh.h
+
+bmesh.a: bmesh.o disk_cycle.o loop_cycle.o radial_cycle.o element_cycle.o elements.o
+
+clean:
+	rm -rf bmesh.a
+	rm -rf bmesh.o
+	rm -rf disk_cycle.o
+	rm -rf loop_cycle.o
+	rm -rf radial_cycle.o
+	rm -rf element_cycle.o
+	rm -rf elements.o

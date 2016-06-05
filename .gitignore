@@ -30,3 +30,6 @@
 # Temporaries and Backups
 *~
 *.orig
+
+# Build directory
+build/*

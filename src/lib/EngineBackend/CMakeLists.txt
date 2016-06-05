@@ -23,3 +23,5 @@ add_library( EngineBackend
   Write_Output_3D.cpp
   Write_Output_Minimal_3D.cpp)
 
+target_include_directories (EngineBackend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../PhysBAMLegacy/)
+target_include_directories (EngineBackend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../ )

@@ -144,7 +144,8 @@ namespace {
 #ifdef ENABLE_MIC
 #define SELECTED_ARCH __m512
 #else
-#define SELECTED_ARCH __m256
+//#define SELECTED_ARCH __m256
+#define SELECTED_ARCH float
 #endif
 //********************************************************************************************
 //

@@ -1,0 +1,10 @@
+# SConscript
+
+Import('env Automatic_Program')
+#env=env.Copy(warnings_are_errors=0)
+env=env.Copy(USE_PTHREADS=True)
+Automatic_Program(env,"CutRegionGenerator",[
+        "main.cpp",
+        "REGION_GENERATOR.cpp",
+        "VOXELIZED_REGION_GENERATOR.cpp"
+        ])

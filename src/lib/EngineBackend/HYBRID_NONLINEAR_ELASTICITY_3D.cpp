@@ -1069,7 +1069,7 @@ Add_Force_Differential_Elasticity_Specialized(T_VECTOR_VARIABLE_VIEW_CONST du,T_
 // Function Stress_Mesh
 //#####################################################################
 template<class T_NONLINEAR_ELASTICITY>
-HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
+typename HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
 HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::
 Stress_Mesh( const int& mesh_element, const TV& multilinear_coordinates ) {
     int block = hybrid_block_mesh_reverse_map( mesh_element )(1);
@@ -1087,7 +1087,7 @@ Stress_Mesh( const int& mesh_element, const TV& multilinear_coordinates ) {
 // Function Stress_Grid
 //#####################################################################
 template<class T_NONLINEAR_ELASTICITY>
-HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
+typename HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
 HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::
 Stress_Grid( const T_INDEX& cell_index, const TV& multilinear_coordinates ) {
     int block = hybrid_block_grid_reverse_map( cell_index )(1);
@@ -1105,7 +1105,7 @@ Stress_Grid( const T_INDEX& cell_index, const TV& multilinear_coordinates ) {
 // Function Strain_Mesh
 //#####################################################################
 template<class T_NONLINEAR_ELASTICITY>
-HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
+typename HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
 HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::
 Strain_Mesh( const int& mesh_element, const TV& multilinear_coordinates ) {
 
@@ -1125,7 +1125,7 @@ Strain_Mesh( const int& mesh_element, const TV& multilinear_coordinates ) {
 // Function Strain_Grid
 //#####################################################################
 template<class T_NONLINEAR_ELASTICITY>
-HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
+typename HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::TV
 HYBRID_NONLINEAR_ELASTICITY<T_NONLINEAR_ELASTICITY>::
 Strain_Grid( const T_INDEX& cell_index, const TV& multilinear_coordinates ) {
 

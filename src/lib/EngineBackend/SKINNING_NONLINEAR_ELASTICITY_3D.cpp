@@ -164,8 +164,8 @@ Initialize_Blocks_Muscles(const int number_of_partitions)
                 cell_iterator.Valid();
                 cell_iterator.Next()){
                 const T_INDEX& index = cell_iterator.Index();
-                //LOG::cout << "Cell " << index << "has a muscle count of " << cell_muscles(index).m << std::endl;
-                block_muscle_count = max(cell_muscles(index).Size(), block_muscle_count);
+                //LOG::cout << "Cell " << index << "has a muscle count of " << this->cell_muscles(index).m << std::endl;
+                block_muscle_count = max(this->cell_muscles(index).Size(), block_muscle_count);
             }
 
             //LOG::cout << "Muscle Block " << block << " has max level of " << block_muscle_count << std::endl;
@@ -192,11 +192,11 @@ Initialize_Blocks_Muscles(const int number_of_partitions)
                         cell_iterator.Next(),cell++)
                         {
                             const T_INDEX& index = cell_iterator.Index();
-                            if(cell_muscles(index).m > block_muscle)
+                            if(this->cell_muscles(index).m > block_muscle)
                                 {
-                                    muscle_id.Last().Set(cell_muscles(index)(block_muscle+1)-1, cell);
-                                    muscle_fiber.Last().Set(cell_fibers(index)(block_muscle+1), cell); 
-                                    muscle_density.Last().Set(cell_densities(index)(block_muscle+1), cell); 
+                                    muscle_id.Last().Set(this->cell_muscles(index)(block_muscle+1)-1, cell);
+                                    muscle_fiber.Last().Set(this->cell_fibers(index)(block_muscle+1), cell); 
+                                    muscle_density.Last().Set(this->cell_densities(index)(block_muscle+1), cell); 
                                  }
                             else
                                 {
@@ -205,8 +205,8 @@ Initialize_Blocks_Muscles(const int number_of_partitions)
                                     muscle_density.Last().Set(T(0), cell); 
                                 }
 
-                            if( !(cell_type(index)==INTERIOR_CELL_TYPE ||
-                                  (/*first_order && */cell_type(index)==BOUNDARY_CELL_TYPE)) )
+                            if( !(this->cell_type(index)==INTERIOR_CELL_TYPE ||
+                                  (/*first_order && */this->cell_type(index)==BOUNDARY_CELL_TYPE)) )
                                 {
                                     muscle_id.Last().Set(DEFAULT_MUSCLE-1,cell);
                                     muscle_fiber.Last().Set(TV(1,0,0), cell); 

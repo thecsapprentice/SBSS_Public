@@ -37,7 +37,7 @@ Update_Position_Based_State_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARI
     for(RANGE_ITERATOR<d> cell_iterator(unpadded_cell_domain);cell_iterator.Valid();cell_iterator.Next()){
         const T_INDEX& cell_index=cell_iterator.Index();
 
-        switch(cell_type(cell_index))
+        switch(this->cell_type(cell_index))
         {
             case BOUNDARY_CELL_TYPE:
                 PHYSBAM_ASSERT(allow_boundary_cells);
@@ -55,12 +55,12 @@ Update_Position_Based_State_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARI
                     Fe+=1;
 
                     for(int m=1;m<=cell_muscles(cell_index).m;m++){
-                        const int muscle=cell_muscles(cell_index)(m);                
-                        const TV& fiber=cell_fibers(cell_index)(m);
-                        const T density=cell_densities(cell_index)(m);
+                        const int muscle=this->cell_muscles(cell_index)(m);                
+                        const TV& fiber=this->cell_fibers(cell_index)(m);
+                        const T density=this->cell_densities(cell_index)(m);
                         const T activation=BASE::muscle_activations(muscle);
                         const T fiber_max_stress=BASE::muscle_fiber_max_stresses(muscle);
-                        TV& F_fiber = cell_F_fibers(cell_index)(m);
+                        TV& F_fiber = this->cell_F_fibers(cell_index)(m);
                         F_fiber=Fe*fiber;
                         T stretch_squared=F_fiber.Magnitude_Squared(),stretch=sqrt(stretch_squared);
                         stretch = min((T)3.0f, stretch);
@@ -108,12 +108,12 @@ Add_Force_First_Order_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARIABLE_V
     const T cell_volume=pow<d>(h);
     for(RANGE_ITERATOR<d> iterator(unpadded_cell_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& cell_index=iterator.Index();
-        if(cell_type(cell_index)==INTERIOR_CELL_TYPE || (/*first_order &&*/ cell_type(cell_index)==BOUNDARY_CELL_TYPE)){
+        if(this->cell_type(cell_index)==INTERIOR_CELL_TYPE || (/*first_order &&*/ this->cell_type(cell_index)==BOUNDARY_CELL_TYPE)){
 
-            for(int m=1;m<=cell_muscles(cell_index).m;m++){
-                const T c1=cell_c1(cell_index)(m);
-                const TV& fiber=cell_fibers(cell_index)(m);
-                const TV& F_fiber = cell_F_fibers(cell_index)(m);
+            for(int m=1;m<=this->cell_muscles(cell_index).m;m++){
+                const T c1=this->cell_c1(cell_index)(m);
+                const TV& fiber=this->cell_fibers(cell_index)(m);
+                const TV& F_fiber = this->cell_F_fibers(cell_index)(m);
                 MATRIX<T,d> Pe=MATRIX<T,d>::Outer_Product(F_fiber,fiber)*c1;
                 //MATRIX<T,d> Pe=M*c1;
 
@@ -123,7 +123,7 @@ Add_Force_First_Order_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARIABLE_V
             }
 
         }
-        else if(cell_type(cell_index)==BOUNDARY_CELL_TYPE)
+        else if(this->cell_type(cell_index)==BOUNDARY_CELL_TYPE)
             PHYSBAM_FATAL_ERROR("Cut cells not yet supported with muscles");
     }
  #endif
@@ -144,12 +144,12 @@ Add_Force_Second_Order_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARIABLE_
 
     for(RANGE_ITERATOR<d> iterator(unpadded_cell_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& cell_index=iterator.Index();
-        if(cell_type(cell_index)==INTERIOR_CELL_TYPE || (/*first_order &&*/ cell_type(cell_index)==BOUNDARY_CELL_TYPE)){
+        if(this->cell_type(cell_index)==INTERIOR_CELL_TYPE || (/*first_order &&*/ this->cell_type(cell_index)==BOUNDARY_CELL_TYPE)){
 
-            for(int m=1;m<=cell_muscles(cell_index).m;m++){
-                const T c1=cell_c1(cell_index)(m);
-                const TV& fiber=cell_fibers(cell_index)(m);
-                const TV& F_fiber = cell_F_fibers(cell_index)(m);
+            for(int m=1;m<=this->cell_muscles(cell_index).m;m++){
+                const T c1=this->cell_c1(cell_index)(m);
+                const TV& fiber=this->cell_fibers(cell_index)(m);
+                const TV& F_fiber = this->cell_F_fibers(cell_index)(m);
                 //const MATRIX<T,d>& M=cell_M(cell_index)(m);
                 MATRIX<T,d> Pe=MATRIX<T,d>::Outer_Product(F_fiber,fiber)*c1;
                 //MATRIX<T,d> Pe=M*c1;
@@ -160,7 +160,7 @@ Add_Force_Second_Order_Muscles(T_VECTOR_VARIABLE_VIEW_CONST u,T_SCALAR_VARIABLE_
             }
 
         }
-        else if(cell_type(cell_index)==BOUNDARY_CELL_TYPE)
+        else if(this->cell_type(cell_index)==BOUNDARY_CELL_TYPE)
             PHYSBAM_FATAL_ERROR("Cut cells not yet supported with muscles");
     }
  

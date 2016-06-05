@@ -553,7 +553,7 @@ Add_Force_Constraints_Mesh(const ARRAY<CONSTRAINT_SEGMENT<T,d> >& constraints, T
             // PHASE 2
             TV force = X(1) - X(2);
             if( constraints(c).is_reference )
-                force *= collision_spring_constants(constraints(c).spring_coefficient_ptr);
+                force *= this->collision_spring_constants(constraints(c).spring_coefficient_ptr);
             else
                 force *= constraints(c).spring_coefficient;
             G(1) = -force;  //Each endpoint undergoes equal and opposite force
@@ -677,7 +677,7 @@ Add_Force_Differential_Constraints_Mesh(const ARRAY<CONSTRAINT_SEGMENT<T,d> >& c
         // PHASE 2
         TV dforce=dX(1)-dX(2);
         if(constraints(c).is_reference)
-            dforce *= collision_spring_constants(constraints(c).spring_coefficient_ptr);
+            dforce *= this->collision_spring_constants(constraints(c).spring_coefficient_ptr);
         else
             dforce *= constraints(c).spring_coefficient;
         dG(1) = -dforce;  //Each endpoint undergoes equal and opposite force

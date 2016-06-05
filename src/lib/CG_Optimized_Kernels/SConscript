@@ -1,0 +1,50 @@
+# # SConscript
+# import os
+
+# Import('env Automatic_Library')
+# env=env.Copy(warnings_are_errors=0)
+# env=env.Copy(shared=0)
+# env=env.Copy(compile_headers=0)
+# env=env.Copy(link=1)
+# env=env.Copy(single_so=0)
+
+# variant_build=os.path.join('build',env['ARCH'],env['TYPE'])
+
+# Automatic_Library(env,
+#                   "CG_OptimizedKernels",
+#                   exclude = [
+#         "./Convergence_Norm/Convergence_Norm_Test.cpp",
+#         "./Dot_Product/Dot_Product_Test.cpp",
+#         "./Project/Project_Test.cpp",
+
+#         "./Vector_Add/Vector_Add_Test.cpp",
+#         "./Vector_Subtract/Vector_Subtract_Test.cpp",
+#         "./Vector_Times/Vector_Times_Test.cpp",
+#         "./Vector_SAXPY_A/Vector_SAXPY_A_Test.cpp",
+#         "./Vector_SAXPY_AB/Vector_SAXPY_AB_Test.cpp",
+#         "./Vector_SAXPY_V/Vector_SAXPY_V_Test.cpp",
+#         "./Vector_SAXPY_V6/Vector_SAXPY_V6_Test.cpp",
+#         "./Vector_SAXPY_V8/Vector_SAXPY_V8_Test.cpp",
+#         "./Vector_SAXPY_V9/Vector_SAXPY_V9_Test.cpp",
+
+#         "./Thread_Queueing/PTHREAD_QUEUE.cpp"
+#         ],
+#                   sources = [
+#         "./Dot_Product/Dot_Product_Helper.cpp",
+#         "./Convergence_Norm/Convergence_Norm_Helper.cpp",
+#         "./Project/Project_Helper.cpp",
+
+#         "./Vector_Add/Vector_Add_Helper.cpp",
+#         "./Vector_Subtract/Vector_Subtract_Helper.cpp",
+#         "./Vector_Times/Vector_Times_Helper.cpp",
+#         "./Vector_SAXPY_A/Vector_SAXPY_A_Helper.cpp",
+#         "./Vector_SAXPY_AB/Vector_SAXPY_AB_Helper.cpp",
+
+#         "./Vector_SAXPY_V/Vector_SAXPY_V_Helper.cpp",
+#         "./Vector_SAXPY_V6/Vector_SAXPY_V6_Helper.cpp",
+#         "./Vector_SAXPY_V8/Vector_SAXPY_V8_Helper.cpp",
+#         "./Vector_SAXPY_V9/Vector_SAXPY_V9_Helper.cpp",
+
+#         #"../image_lattice_deformer_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.cpp",
+#         ]
+#                   )   

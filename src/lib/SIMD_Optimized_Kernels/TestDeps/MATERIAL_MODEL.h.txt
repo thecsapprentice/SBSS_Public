@@ -1,0 +1,76 @@
+[31m//#####################################################################[m
+[31m// Copyright 2011, Taylor Patterson, Eftychios Sifakis.[m
+[31m// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.[m
+[31m//#####################################################################[m
+[31m// Class MATERIAL_MODEL[m
+[31m//#####################################################################[m
+[01;34m#ifndef[m __MATERIAL_MODEL__
+[01;34m#define[m __MATERIAL_MODEL__
+
+[01;34m#include[m [31m"ROTATED_STRESS_DERIVATIVE.h"[m
+
+[01;34mnamespace[m PhysBAM[31m{[m
+
+[01;34mtemplate[m[31m<[m[01;34mclass[m [37mT_MATERIAL[m[31m>[m
+[01;34mclass[m [37mMATERIAL_MODEL[m[31m:[m[01;34mpublic[m T_MATERIAL
+[31m{[m
+    [01;34mtypedef[m [01;34mtypename[m [37mT_MATERIAL[m[31m::[m[37mT_SCALAR[m T[31m;[m
+    [01;34menum[m [31m{[md[31m=[mT_MATERIAL[31m::[mdim[31m}[m[31m;[m
+
+[01;34mpublic[m[31m:[m
+
+    [01;34mstatic[m [32mbool[m [01;30mIs_Mooney_Rivlin[m[31m()[m
+    [31m{[m[01;34mreturn[m T_MATERIAL[31m::[mis_mooney_rivlin[31m;[m[31m}[m
+
+    [31m// Non Mooney-Rivlin[m
+    [01;34mstatic[m [37mDIAGONAL_MATRIX<T,d>[m [01;30mP_hat[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Sigma[31m,[m[01;34mconst[m [37mT[m p[31m,[m[01;34mconst[m [37mT[m mu[31m,[m[01;34mconst[m [37mT[m alpha[31m)[m
+    [31m{[m[01;34mreturn[m [01;30mDeviatoric_P_hat[m[31m([mSigma[31m,[mmu[31m)+[malpha[31m*[mp[31m*[m[01;30mQ_hat[m[31m([mSigma[31m);[m[31m}[m
+
+    [31m// Mooney-Rivlin[m
+    [01;34mstatic[m [37mDIAGONAL_MATRIX<T,d>[m [01;30mP_hat[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Sigma[31m,[m[01;34mconst[m [37mT[m p[31m,[m[01;34mconst[m [37mT[m mu_10[31m,[m[01;34mconst[m [37mT[m mu_01[31m,[m[01;34mconst[m [37mT[m alpha[31m)[m
+    [31m{[m[01;34mreturn[m [01;30mDeviatoric_P_hat[m[31m([mSigma[31m,[mmu_10[31m,[mmu_01[31m)+[malpha[31m*[mp[31m*[m[01;30mQ_hat[m[31m([mSigma[31m);[m[31m}[m
+
+    [01;34mstatic[m [37mT[m [01;30mq[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Sigma[31m,[m[01;34mconst[m [37mT[m p[31m,[m[01;34mconst[m [37mT[m alpha[31m,[m[01;34mconst[m [37mT[m alpha_squared_over_kappa[31m)[m
+    [31m{[m[01;34mreturn[m [31m-[malpha[31m*[m[01;30mM[m[31m([mSigma[31m)+[malpha_squared_over_kappa[31m*[mp[31m;[m[31m}[m
+
+    [01;34mstatic[m [37mMATRIX<T,d>[m [01;30mdP_hat[m[31m([m[01;34mconst[m ROTATED_STRESS_DERIVATIVE[31m<[mT[31m,[md[31m>&[m rotated_dPdF[31m,[m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Q_hat[31m,[m[01;34mconst[m MATRIX[31m<[mT[31m,[md[31m>&[m dF_hat[31m,[m[01;34mconst[m [37mT[m dp[31m,[m[01;34mconst[m [37mT[m alpha[31m)[m
+    [31m{[m[01;34mreturn[m rotated_dPdF[31m.[m[01;30mdP_hat[m[31m([mdF_hat[31m)+[malpha[31m*[mdp[31m*[mQ_hat[31m;[m[31m}[m
+
+    [01;34mstatic[m [37mT[m [01;30mdq[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Q_hat[31m,[m[01;34mconst[m MATRIX[31m<[mT[31m,[md[31m>&[m dF_hat[31m,[m[01;34mconst[m [37mT[m dp[31m,[m[01;34mconst[m [37mT[m alpha[31m,[m[01;34mconst[m [37mT[m alpha_squared_over_kappa[31m)[m
+    [31m{[m[01;34mreturn[m [31m-[malpha[31m*[mQ_hat[31m.[m[01;30mTimes_Transpose[m[31m([mdF_hat[31m).[m[01;30mTrace[m[31m()+[malpha_squared_over_kappa[31m*[mdp[31m;[m[31m}[m
+
+    [31m// Non Mooney-Rivlin[m
+    [01;34mstatic[m [37mROTATED_STRESS_DERIVATIVE<T,d>[m [01;30mIsotropic_Stress_Derivative[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Sigma[31m,[m[01;34mconst[m [37mT[m p[31m,[m[01;34mconst[m [37mT[m mu[31m,[m[01;34mconst[m [37mT[m kappa[31m,[m[01;34mconst[m [37mT[m alpha[31m,[m[01;34mconst[m [32mbool[m apply_definiteness_fix[31m)[m
+    [31m{[m
+        [01;30mPHYSBAM_ASSERT[m[31m(![m[01;30mIs_Mooney_Rivlin[m[31m());[m
+
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF[31m=[m[01;30mAugmented_Rotated_Stress_Derivative[m[31m([mSigma[31m,[mp[31m,[mmu[31m,[malpha[31m);[m
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF_indefinite[31m=[m[01;30mRotated_Stress_Derivative[m[31m([mSigma[31m,[mmu[31m,[mkappa[31m);[m
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF_incremental_fix[31m=[mrotated_dPdF_indefinite[31m;[m
+        rotated_dPdF_incremental_fix[31m.[m[01;30mMake_Positive_Definite[m[31m();[m
+        rotated_dPdF_incremental_fix[31m-=[mrotated_dPdF_indefinite[31m;[m
+        [01;34mif[m[31m([mapply_definiteness_fix[31m)[m rotated_dPdF[31m+=[mrotated_dPdF_incremental_fix[31m;[m
+
+        [01;34mreturn[m rotated_dPdF[31m;[m
+    [31m}[m
+
+    [31m// Mooney-Rivlin[m
+    [01;34mstatic[m [37mROTATED_STRESS_DERIVATIVE<T,d>[m [01;30mIsotropic_Stress_Derivative[m[31m([m[01;34mconst[m DIAGONAL_MATRIX[31m<[mT[31m,[md[31m>&[m Sigma[31m,[m[01;34mconst[m [37mT[m p[31m,[m[01;34mconst[m [37mT[m mu_10[31m,[m[01;34mconst[m [37mT[m mu_01[31m,[m[01;34mconst[m [37mT[m kappa[31m,[m[01;34mconst[m [37mT[m alpha[31m,[m[01;34mconst[m [32mbool[m apply_definiteness_fix[31m)[m
+    [31m{[m
+        [01;30mPHYSBAM_ASSERT[m[31m([m[01;30mIs_Mooney_Rivlin[m[31m());[m
+
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF[31m=[m[01;30mAugmented_Rotated_Stress_Derivative[m[31m([mSigma[31m,[mp[31m,[mmu_10[31m,[mmu_01[31m,[malpha[31m);[m
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF_indefinite[31m=[m[01;30mRotated_Stress_Derivative[m[31m([mSigma[31m,[mmu_10[31m,[mmu_01[31m,[mkappa[31m);[m
+        [37mROTATED_STRESS_DERIVATIVE<T,d>[m rotated_dPdF_incremental_fix[31m=[mrotated_dPdF_indefinite[31m;[m
+        rotated_dPdF_incremental_fix[31m.[m[01;30mMake_Positive_Definite[m[31m();[m
+        rotated_dPdF_incremental_fix[31m-=[mrotated_dPdF_indefinite[31m;[m
+        [01;34mif[m[31m([mapply_definiteness_fix[31m)[m rotated_dPdF[31m+=[mrotated_dPdF_incremental_fix[31m;[m
+
+        [01;34mreturn[m rotated_dPdF[31m;[m
+    [31m}[m
+
+[31m}[m[31m;[m
+
+[31m}[m
+
+[01;34m#endif[m

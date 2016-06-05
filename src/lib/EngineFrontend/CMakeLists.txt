@@ -1,0 +1,14 @@
+add_library( EngineFrontend
+ANALYTIC_COLLISION.cpp
+CLElib.cpp
+ELASTIC_LATTICE_DEFORMER.cpp
+EMBEDDING_TOOLS.cpp
+OPENVDB_LEVELSET_COLLISION_2D.cpp
+OPENVDB_LEVELSET_COLLISION_3D.cpp
+PHYSBAM_LEVELSET_COLLISION.cpp
+PHYSBAM_RIGID_BODY_LEVELSET_COLLISION.cpp
+Write_Output.cpp
+)
+
+target_include_directories (EngineFrontend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../PhysBAMLegacy/)
+target_include_directories (EngineFrontend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../ )
