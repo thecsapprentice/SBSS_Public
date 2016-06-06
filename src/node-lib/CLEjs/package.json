@@ -1,0 +1,8 @@
+{
+  "name": "CLEjs-module",
+  "version": "0.1.0",
+  "description": "Native module wrapping the highly optimized CLElib for surgery simulation.",
+  "dependencies": {
+    "nan": "^2.3.5"
+  }
+}

@@ -107,7 +107,6 @@ PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.cpp
 PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.cpp
 PhysBAM_Tools/Krylov_Solvers/SYMMCGNE.cpp
 PhysBAM_Tools/Krylov_Solvers/SYMMQMR.cpp
-PhysBAM_Tools/Krylov_Solvers/SYMMQMR.cpp.orig
 PhysBAM_Tools/Log/DEBUG_PRINT.cpp
 PhysBAM_Tools/Log/DEBUG_SUBSTEPS.cpp
 PhysBAM_Tools/Log/DEBUG_UTILITIES.cpp
