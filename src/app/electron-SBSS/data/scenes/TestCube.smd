@@ -1,0 +1,19 @@
+{
+    "dynamicObjects" : {
+        "Cube.obj" : {
+         "textureMap" : 1,      
+            "normalMap" : 2             
+        }
+    },
+    "fixedGeometry" : {
+        "regions": [
+            [ [-1.2, -1.2, -1.2], [1.2, -0.8, 1.2] ]
+        ]        
+    },
+    "physicsNodeSpacing" : 0.004,
+    "incisionWidth" : 0.0036,
+    "textureFiles" : {
+        "rplastyTextureTop2.bmp" : 1,
+        "rplastyTextureTop2Nrm.bmp" : 2
+    }
+}

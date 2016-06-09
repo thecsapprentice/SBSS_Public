@@ -1,0 +1,21 @@
+{
+    "dynamicObjects" : {
+        "zPlasty_HighResUVW.obj" : {
+            "textureMap" : 1,
+            "normalMap" : 2
+        }
+    },
+    "fixedGeometry" : {
+        "mesh" : "zPlasty_HighRes.Fixed.obj"        
+    },
+    "hookStiffness" : 1e3,
+    "sutureStiffness" : 1e3,
+    "poissonsRatio" : 0.45,
+    "youngsModulus" : 3e4,
+    "physicsNodeSpacing" : 0.005,
+    "incisionWidth" : 0.0036,
+    "textureFiles" : {
+        "zplastyTextureTop2.bmp" : 1,
+        "zplastyTextureTop2Nrm.bmp" : 2
+    }
+}

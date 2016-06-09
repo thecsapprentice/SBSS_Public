@@ -1,0 +1,17 @@
+{
+    "dynamicObjects" : {
+        "zPlasty_HighResUVW.obj" : {
+            "textureMap" : 1,
+            "normalMap" : 2
+        }
+    },
+    "fixedGeometry" : {
+        "mesh" : "zPlasty_HighRes.Fixed.obj"        
+    },
+    "physicsNodeSpacing" : 0.011,
+    "incisionWidth" : 0.0036,
+    "textureFiles" : {
+        "zplastyTextureTop2.bmp" : 1,
+        "zplastyTextureTop2Nrm.bmp" : 2
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "dynamicObjects" : {
+        "RhomboidUltraHighResUVW.obj" : {
+            "textureMap" : 1,
+            "normalMap" : 2
+        }
+    },
+    "fixedGeometry" : {
+        "regions": [
+            [ [0.121212, -0.025000, -0.125000], [0.121212, -0.025000, -0.121212] ],
+            [ [-0.125000, -0.025000, 0.121212], [-0.125000, -0.025000, 0.125000] ],
+            [ [0.121212, -0.025000, 0.121212], [0.121212, -0.025000, 0.125000] ],
+            [ [-0.125000, -0.025000, -0.125000], [-0.125000, -0.025000, -0.121212] ]
+        ]        
+    },
+    "physicsNodeSpacing" : 0.011,
+    "incisionWidth" : 0.0036,
+    "textureFiles" : {
+        "rplastyTextureTop2.bmp" : 1,
+        "rplastyTextureTop2Nrm.bmp" : 2
+    }
+}

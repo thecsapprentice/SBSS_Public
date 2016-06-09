@@ -1,0 +1,37 @@
+{
+    "collisionObject" : "skullTemporalis_collision.obj",
+    "dynamicObjects" : {
+        "scalpBagUVW.obj" : {
+            "textureMap" : 1,
+            "normalMap" : 2
+        }
+    },
+    "fixedGeometry" : {
+        "mesh": "scalpBagHighRes.Fixed.obj"     
+    },
+    "fixedObjects" : {
+        "lowerFace.obj" : {
+            "textureMap" : 1,
+            "normalMap" : 2
+        },
+        "skullTemporalis.obj" : {
+            "textureMap" : 3,
+            "normalMap" : 4
+        },
+        "eyes.obj" : {
+            "textureMap" : 5,
+            "normalMap" : 2
+        }
+    },
+    "physicsNodeSpacing" : 0.007,
+    "incisionWidth" : 0.002,
+    "hookStiffness" : 1e4,
+    "sutureStiffness" : 1e5,
+    "textureFiles" : {
+        "lowerFaceTexture.bmp" : 1,
+        "lowerFaceTextureNrm.bmp" : 2,
+        "skullTemporalis.bmp" : 3,
+        "skullTemporalisNrm.bmp" : 4,
+        "eye_texture.bmp" : 5
+    }
+}
