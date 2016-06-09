@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <vector>
+#include <array>
 
 class EMBEDDED_DEFORMER_BASE{
 public:
@@ -77,12 +78,18 @@ public:
     void Set_Suture_Stiffness(const float suture_stiffness);
 
     // May be called anytime, but after the call to Set_Fixed_Triangles
-    int Add_Hook(const int triangle_id,const float (&weights)[2]);
-    int Add_Hook(const float(&location)[3]);
-    void Move_Hook(const int hook_id,const float(&location)[3]);
+    /* DEPRECATED */ int Add_Hook(const int triangle_id,const float (&weights)[2]);  
+    /* DEPRECATED */ int Add_Hook(const float(&location)[3]);                        
+    int Add_Hook(const int triangle_id, const std::array<float,2>& weights);
+    int Add_Hook(const std::array<float,3>& location);
+    /* DEPRECATED */ void Move_Hook(const int hook_id,const float(&location)[3]);
+    void Move_Hook(const int hook_id,const std::array<float,3>& location);
     void Delete_Hook(const int hook_id);
-    int Add_Suture(const int triangle_id1,const float (&weights1)[2],const int triangle_id2,const float (&weights2)[2]);
-    int Add_Suture(const float(&location1)[3], const float(&location2)[3]);
+    /* DEPRECATED */ int Add_Suture(const int triangle_id1,const float (&weights1)[2],const int triangle_id2,const float (&weights2)[2]);
+    int Add_Suture(const int triangle_id1,const std::array<float,2> &weights1,
+                   const int triangle_id2,const std::array<float,2> &weights2);
+    /* DEPRECATED */ int Add_Suture(const float(&location1)[3], const float(&location2)[3]);
+    int Add_Suture(std::array<float,3>& location1, std::array<float,3>& location2);
     void Delete_Suture(const int suture_id);
 
     // May be called anytime, but after the call to Set_Fixed_Triangles
@@ -91,12 +98,17 @@ public:
 
     // These mirror the original vertices array, given in Create_Model
     void Update_Fine_Displacement();
-    void Get_Vertices(std::vector<double>& vertices) const;
-    void Get_Strain(std::vector<double>& strain) const;
-    void Get_Stress(std::vector<double>& strain) const;
 
-    void Get_Vertices(std::vector<double>& vertices, int& sinceFrame) const;
-    void Get_Vertex_Data( std::vector<double>& vdata, int type, int &sinceFrame) const;
+    /* DEPRECATED */ void Get_Vertices(std::vector<double>& vertices) const;
+    /* DEPRECATED */ void Get_Strain(std::vector<double>& strain) const;
+    /* DEPRECATED */ void Get_Stress(std::vector<double>& strain) const;
+    /* DEPRECATED */ void Get_Vertices(std::vector<double>& vertices, int& sinceFrame) const;
+    /* DEPRECATED */ void Get_Vertex_Data( std::vector<double>& vdata, int type, int &sinceFrame) const;
+    void Get_Vertices(std::vector<float>& vertices) const;
+    void Get_Strain(std::vector<float>& strain) const;
+    void Get_Stress(std::vector<float>& strain) const;
+    void Get_Vertices(std::vector<float>& vertices, int& sinceFrame) const;
+    void Get_Vertex_Data( std::vector<float>& vdata, int type, int &sinceFrame) const;
 
 
     void Update_Embedded_Surfaces();

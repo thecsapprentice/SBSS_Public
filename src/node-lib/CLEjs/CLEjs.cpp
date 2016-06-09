@@ -1,5 +1,7 @@
 #include "CLEjs.h"
 #include <iostream>
+#include <vector>
+#include <array>
 
 template<class T>
 std::vector<T> load_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
@@ -11,6 +13,30 @@ std::vector<T> load_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info
     for( int i = 0; i < (BufLength / sizeof(T)); i++)
         T_vec.push_back( T_Data[i] );   
     return T_vec;
+}
+
+template<class T, int size>
+std::array<T,size> load_std_array( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
+    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+    char*         BufData   = node::Buffer::Data(BufObj);
+    size_t        BufLength = node::Buffer::Length(BufObj);
+    T* T_Data = (T*)(BufData);
+    std::array<T,size> T_arr; 
+    for( int i = 0; i < (BufLength / sizeof(T)); i++)
+        T_arr[i] = T_Data[i];   
+    return T_arr;
+}
+
+template<class T>
+void save_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot, const std::vector<T>& T_vec ){
+    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+    char*         BufData   = node::Buffer::Data(BufObj);
+    size_t        BufLength = node::Buffer::Length(BufObj);
+    T* T_Data = (T*)(BufData);
+    if( T_vec.size() > (BufLength/sizeof(T)) )
+        Nan::ThrowRangeError("Insufficient space allocated for array copy.");
+    for( int i = 0; i < T_vec.size(); i++)
+        T_Data[i] = T_vec[i];   
 }
 
 
@@ -74,7 +100,6 @@ void CLEjs::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "Get_Vertex_Data",  __Get_Vertex_Data);
   Nan::SetPrototypeMethod(tpl,  "Update_Embedded_Surfaces",  __Update_Embedded_Surfaces);
   Nan::SetPrototypeMethod(tpl,  "Generate_UFine_MeshMap",  __Generate_UFine_MeshMap);
-  Nan::SetPrototypeMethod(tpl,  "UpdateDirichletCells",  __UpdateDirichletCells);
   Nan::SetPrototypeMethod(tpl,  "Update_Collisions",  __Update_Collisions);
   Nan::SetPrototypeMethod(tpl,  "WriteDebug",  __WriteDebug);
   Nan::SetPrototypeMethod(tpl,  "Apply_Perturbation",  __Apply_Perturbation);
@@ -132,7 +157,7 @@ void CLEjs::__Create_Model(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     double dx_in = info[2]->IsUndefined() ? 1.0 : info[2]->NumberValue();
     double refine_in = info[3]->IsUndefined() ? 1.0 : info[3]->NumberValue();
 
-    obj->Create_Model( vertex_in, triangle_in, dx_in, refine_in );        
+    obj->Create_Model( vertex_in, triangle_in, dx_in, refine_in );
 };
 
 void CLEjs::__Add_Static_Model(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -230,7 +255,10 @@ void CLEjs::__SetTextureParameters(const Nan::FunctionCallbackInfo<v8::Value>& i
 void CLEjs::__GetTextureStress(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
     typedef float T;
-    // TODO
+    std::vector<T> texdata;
+    obj->GetTextureStress( texdata );       
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(texdata.data()),
+                                              texdata.size()*sizeof(T)).ToLocalChecked());    
 };
 
 void CLEjs::__Set_Fixed_Geometry(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -312,21 +340,150 @@ void CLEjs::__Set_Suture_Stiffness(const Nan::FunctionCallbackInfo<v8::Value>& i
     obj->Set_Suture_Stiffness( suture_stiffness_in );
 };
 
-void CLEjs::__Add_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Move_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Delete_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Delete_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Advance_One_Time_Step(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__WaitForSolve(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Update_Fine_Displacement(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Get_Vertices(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Get_Strain(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Get_Stress(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Get_Vertex_Data(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Update_Embedded_Surfaces(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Generate_UFine_MeshMap(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__UpdateDirichletCells(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Update_Collisions(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__WriteDebug(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
-void CLEjs::__Apply_Perturbation(const Nan::FunctionCallbackInfo<v8::Value>& info) { };
+void CLEjs::__Add_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    int ret = -1;
+    
+    if( info.Length() == 1 ){
+        std::array<T,3> location = load_std_array<T,3>(info,0);      
+        ret = obj->Add_Hook( location );
+    }
+    if( info.Length() == 2 ){
+        int triangle_id_in = info[0]->NumberValue();
+        std::array<T,2> weights = load_std_array<T,2>(info,1);      
+        ret = obj->Add_Hook( triangle_id_in, weights );
+    }
+    
+    info.GetReturnValue().Set(ret);    
+};
+
+void CLEjs::__Move_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    int hook_id_in = info[0]->NumberValue();
+    std::array<T,3> location_in = load_std_array<T,3>(info,1);      
+    obj->Move_Hook( hook_id_in, location_in );
+};
+
+void CLEjs::__Delete_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    int hook_id_in = info[0]->NumberValue();
+    obj->Delete_Hook( hook_id_in );
+};
+
+void CLEjs::__Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    int ret = -1;
+    
+    if( info.Length() == 4 ){
+        int triangle1_id_in = info[0]->NumberValue();
+        std::array<T,2> weights1 = load_std_array<T,2>(info,1);      
+        int triangle2_id_in = info[2]->NumberValue();
+        std::array<T,2> weights2 = load_std_array<T,2>(info,3);      
+        ret = obj->Add_Suture( triangle1_id_in, weights1, triangle2_id_in, weights2 );       
+    }
+    if( info.Length() == 2 ){
+        std::array<T,3> location1 = load_std_array<T,3>(info,0);
+        std::array<T,3> location2 = load_std_array<T,3>(info,1);      
+        ret = obj->Add_Suture( location1, location2 );
+    }
+    
+    info.GetReturnValue().Set(ret);
+};
+
+void CLEjs::__Delete_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    int suture_id_in = info[0]->NumberValue();
+    obj->Delete_Suture( suture_id_in );
+};
+
+void CLEjs::__Advance_One_Time_Step(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->Advance_One_Time_Step();
+};
+
+void CLEjs::__WaitForSolve(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->WaitForSolve();
+};
+
+void CLEjs::__Update_Fine_Displacement(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->Update_Fine_Displacement();
+};
+
+void CLEjs::__Get_Vertices(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+
+    std::vector<T> vertex_data;
+    
+    if( info.Length() == 1 ){
+        int since_frame = info[0]->NumberValue();
+        obj->Get_Vertices( vertex_data, since_frame );
+    }
+    else{
+        obj->Get_Vertices( vertex_data );
+    }
+
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(vertex_data.data()),
+                                              vertex_data.size()*sizeof(T)).ToLocalChecked());               
+};
+
+void CLEjs::__Get_Strain(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    std::vector<T> strain_data;
+    obj->Get_Strain( strain_data );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(strain_data.data()),
+                                              strain_data.size()*sizeof(T)).ToLocalChecked());      
+};
+
+void CLEjs::__Get_Stress(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    std::vector<T> stress_data;
+    obj->Get_Stress( stress_data );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(stress_data.data()),
+                                              stress_data.size()*sizeof(T)).ToLocalChecked());      
+};
+
+void CLEjs::__Get_Vertex_Data(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    typedef float T;
+    std::vector<T> v_data;
+    int type_in = info[0]->NumberValue();
+    int since_frame_in = info[1]->NumberValue();
+    obj->Get_Vertex_Data( v_data, type_in, since_frame_in );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(v_data.data()),
+                                              v_data.size()*sizeof(T)).ToLocalChecked());        
+};
+
+void CLEjs::__Update_Embedded_Surfaces(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->Update_Embedded_Surfaces();
+};
+
+void CLEjs::__Generate_UFine_MeshMap(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->Generate_UFine_MeshMap();
+};
+
+void CLEjs::__Update_Collisions(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    obj->Update_Collisions();
+};
+
+void CLEjs::__WriteDebug(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    bool andDie_in = info[0]->BooleanValue();
+    obj->WriteDebug( andDie_in );
+};
+
+void CLEjs::__Apply_Perturbation(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    float perturb_in = info[0]->NumberValue();
+    obj->Apply_Perturbation( perturb_in );
+};

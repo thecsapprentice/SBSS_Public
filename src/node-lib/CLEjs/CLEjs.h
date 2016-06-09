@@ -82,7 +82,6 @@ class CLEjs : public Nan::ObjectWrap, public CLElib {
      static void __Get_Vertex_Data(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Update_Embedded_Surfaces(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Generate_UFine_MeshMap(const Nan::FunctionCallbackInfo<v8::Value>& info);
-     static void __UpdateDirichletCells(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Update_Collisions(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __WriteDebug(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Apply_Perturbation(const Nan::FunctionCallbackInfo<v8::Value>& info);
