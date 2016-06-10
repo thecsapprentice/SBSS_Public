@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
+  "binary": {
+    "module_name": "electron",
+    "module_path": ".bin/electron",
+    "host": "localhost"
+  },
   "scripts": {
     "start": "electron main.js"
   },
@@ -24,8 +29,11 @@
   "homepage": "https://github.com/atom/electron-quick-start#readme",
   "devDependencies": {
     "electron-prebuilt": "^0.36.0",
-      "ws": "*",
-      "request":"*",
-      "dispatch":"*"
+    "ws": "*",
+    "request": "*",
+    "express": "*"
+  },
+  "dependencies": {
+    "async": "~2.0.0-rc.6"
   }
 }
