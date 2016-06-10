@@ -8,10 +8,16 @@ const BrowserWindow = electron.BrowserWindow;
 var path           = require('path')
 var fs             = require('fs')
 var url            = require('url')
+var http           = require('http');
 var querystring    = require('querystring')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+
+var SBSS_Service = require('./sbss-service.js')
+let sbss_service;
+let http_server;
+var dispatch = require('dispatch');
 
 function LoadAvailableHistories(callback){
     fs.readdir( path.join( path.normalize(__dirname),'data','history'), function(err, history_files){
@@ -38,8 +44,30 @@ function LoadAvailableScenes(callback){
 }
 
 function createWindow () {
+   
     var protocol       = electron.protocol;
 
+    http_server = http.createServer(
+        dispatch({
+            '/history/:name': function(req, res, name){
+                console.log( "Accessing history file: ", name );
+
+                
+                
+            }
+        }));
+
+    //Lets start our server
+    http_server.listen(8081,function(){
+        //Callback triggered when server is successfully listening. Hurray!
+        console.log("Server listening on: http://localhost:%s", 8081);
+    });
+    
+    sbss_service = new SBSS_Service();
+    sbss_service.Initialize({
+        port: 8080
+    });
+    
     protocol.registerStandardSchemes(['sbss-data']);
     
     protocol.registerBufferProtocol('sbss-data', function(req, callback) {
@@ -56,7 +84,10 @@ function createWindow () {
                 console.log( "Loading Scenes..." )
                 LoadAvailableScenes(callback)
             }
-            break;            
+            break;
+        default:
+            console.log( "Unknown Resource Indentifier: %s", uri.host );
+            break;
         }
        
                 
