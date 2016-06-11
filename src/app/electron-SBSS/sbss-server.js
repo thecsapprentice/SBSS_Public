@@ -74,8 +74,6 @@ function StateData(){
         if( this.dynamic.maxTimestamp() >= since )
             json_data.dynamic = this.dynamic.JSONify( since );
 
-        console.log( json_data );
-
         json_data["static"] = []
         for( obj in this.staticobjects )
             if( this.staticobjects[obj].maxTimestamp() >= since )
@@ -108,7 +106,7 @@ function SBSS_Server() {
 SBSS_Server.prototype.UpdateData = function() {
     var self=this;
     console.log( "Current State is at", self.state_data.maxTimestamp() );
-
+   
     for( var connectionID in self.connections )
         self.UpdateClient( connectionID )
 }
@@ -165,12 +163,15 @@ SBSS_Server.prototype.UpdateDynamicData = function(topology, vertices, uv ){
 }
 
 SBSS_Server.prototype.SetTextureName = function( texname ){
-
-
+    var self=this
+    self.state_data.dynamic.texturename = texname;
+    self.state_data.dynamic.texturename_timestamp = self.IncTimestamp();
 }
 
 SBSS_Server.prototype.SetNormalName = function( normname ){
-
+    var self=this
+    self.state_data.dynamic.normalname = normname;
+    self.state_data.dynamic.normalname_timestamp = self.IncTimestamp();
     
 }
 

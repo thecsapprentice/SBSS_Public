@@ -76,9 +76,16 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
         callback( "Failed to parse and load dynamic model." );
         return;
     }
+    
     var dyn_texture;
     var dyn_normals;
-    
+
+    for( dynobj in scene.dynamicObjects ){
+        dyn_texture = scene.dynamicObjects[dynobj].textureMap
+        dyn_normals = scene.dynamicObjects[dynobj].normalMap
+        break;
+    }
+         
     var static_models = [];
     for( model_d in model_data ){
         if(model_d == 0)
@@ -94,9 +101,11 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
     
 
     
-    self.server.UpdateDynamicData(dynamic_model.Flatten("vertex"), 
-                                  dynamic_model.Flatten("triangles"),
+    self.server.UpdateDynamicData(dynamic_model.Flatten("topology"),
+                                  dynamic_model.Flatten("vertex"),                                   
                                   dynamic_model.Flatten("uv"))
+    self.server.SetTextureName(dyn_texture)
+    self.server.SetNormalName(dyn_normals)
     self.server.UpdateData();    
 }
 

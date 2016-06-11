@@ -72,8 +72,8 @@ TriangulatedSurfaceObject.prototype.LoadFromBuffer = function(buffer) {
             face_uv = []
             for( p in parts ){
                 fragments = parts[p].split('/');
-                face_vertices.push( fragments.shift() ) // Grab the first identifier as the vertex;
-                face_uv.push( fragments.shift() ) // Grab the second identifier as the uv;
+                face_vertices.push( fragments.shift()-1 ) // Grab the first identifier as the vertex;
+                face_uv.push( fragments.shift()-1 ) // Grab the second identifier as the uv;
             }
             triangles.push( face_vertices );
             uv_triangles.push( face_uv );
@@ -111,12 +111,12 @@ TriangulatedSurfaceObject.prototype._VerifyData = function( v, f, uvf, vt, vn ){
 
     for( triangle in f )
         for(node in f[triangle])
-            if( f[triangle][node] > v.length || f[triangle][node] < 1 )
+            if( f[triangle][node] >= v.length || f[triangle][node] < 0 )
                 return false;
 
     for( triangle in uvf )
         for(node in uvf[triangle])
-            if( uvf[triangle][node] > vt.length || uvf[triangle][node] < 1 )
+            if( uvf[triangle][node] >= vt.length || uvf[triangle][node] < 0 )
                 return false;
 
 
