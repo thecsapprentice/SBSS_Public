@@ -1,0 +1,8 @@
+{
+  "name": "legacy-cutter-module",
+  "version": "0.1.0",
+  "description": "Native module wrapping the old cutter that Court Cutting wrote",
+  "dependencies": {
+    "nan": "^2.3.5"
+  }
+}

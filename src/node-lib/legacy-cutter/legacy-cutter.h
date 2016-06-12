@@ -1,0 +1,43 @@
+#ifndef __LEGACY_CUTTER_H__
+#define __LEGACY_CUTTER_H__
+
+#include <nan.h>
+#include <vector>
+
+class skinGraphics;
+class incision;
+
+//using namespace PhysBAM;
+void InitAll(v8::Local<v8::Object> exports);
+
+class Legacy_Cutter : public Nan::ObjectWrap {
+ public:
+  static void Init(v8::Local<v8::Object> exports);
+ 
+ private:
+
+ explicit Legacy_Cutter();
+  ~Legacy_Cutter();
+  
+  // Helper methods
+  bool texturePickCode(const int triangle, const float (&uv)[2], float (&uvw)[3], float &triangleDuv);
+  void CreateIncision( const std::vector<int>& path_triangles, const std::vector<float>& path_uvs, 
+                       const std::vector<float>& path_positions, const std::vector<float>& path_normals, 
+                       const bool edge_start, const bool edge_end );
+      
+  
+  // Wrapper methods
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static Nan::Persistent<v8::Function> constructor;
+  
+  static void __ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  static void __makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  
+  // Members
+  incision* _incis;
+  skinGraphics* _sg; 
+     
+};
+
+#endif
+

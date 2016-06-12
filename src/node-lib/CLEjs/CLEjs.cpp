@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 
+namespace {
 template<class T>
 std::vector<T> load_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
     v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
@@ -38,7 +39,7 @@ void save_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot
     for( int i = 0; i < T_vec.size(); i++)
         T_Data[i] = T_vec[i];   
 }
-
+}
 
 void InitAll(v8::Local<v8::Object> exports) {
   CLEjs::Init(exports);

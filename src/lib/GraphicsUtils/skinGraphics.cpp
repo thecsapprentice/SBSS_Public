@@ -230,10 +230,10 @@ bool skinGraphics::setTopTextureFilesCreateProgram(const char *topTextureFile, c
 	att[1] = "vNormal";
 	att[2] = "vTangent";
 	att[3] = "vTexture";
-	bool ret = _wxg->addCustomSceneNode(this,topTextureFile,topNormalFile,skinVertexShader,skinFragmentShader,att);
-	if(!ret)
-		return ret;
-	_wxg->getLightsShaders()->useGlslProgram(_glslProgram);  // must be current program. This routine sets other uniforms.
+	//bool ret = _wxg->addCustomSceneNode(this,topTextureFile,topNormalFile,skinVertexShader,skinFragmentShader,att);
+	//if(!ret)
+	//	return ret;
+	//_wxg->getLightsShaders()->useGlslProgram(_glslProgram);  // must be current program. This routine sets other uniforms.
 	if(!_bufferObjects[0])
 		//glGenBuffers(5, _bufferObjects);
 //	else	{  // COURT - is this necessary or can I just realloc in same objects?
