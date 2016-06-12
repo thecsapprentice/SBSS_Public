@@ -10,25 +10,54 @@
 namespace {
 template<class T>
 std::vector<T> load_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
-    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
-    char*         BufData   = node::Buffer::Data(BufObj);
-    size_t        BufLength = node::Buffer::Length(BufObj);
-    T* T_Data = (T*)(BufData);
-    std::vector<T> T_vec; T_vec.reserve( (BufLength / sizeof(T)) );
-    for( int i = 0; i < (BufLength / sizeof(T)); i++)
-        T_vec.push_back( T_Data[i] );   
+    std::vector<T> T_vec;
+    Nan::HandleScope scope;
+    v8::Handle<v8::Value> val;
+    
+    if (info[slot]->IsArray()) {
+        v8::Handle<v8::Array> jsArray = v8::Handle<v8::Array>::Cast(info[slot]);
+        for (unsigned int i = 0; i < jsArray->Length(); i++) {
+            val = jsArray->Get(i);
+            T_vec.push_back(val->NumberValue());
+        }
+    }
+    else{       
+        v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+        char*         BufData   = node::Buffer::Data(BufObj);
+        size_t        BufLength = node::Buffer::Length(BufObj);
+        T* T_Data = (T*)(BufData);
+        T_vec.reserve( (BufLength / sizeof(T)) );
+        for( int i = 0; i < (BufLength / sizeof(T)); i++)
+            T_vec.push_back( T_Data[i] );
+    }
     return T_vec;
 }
 
 template<class T, int size>
 std::array<T,size> load_std_array( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
-    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
-    char*         BufData   = node::Buffer::Data(BufObj);
-    size_t        BufLength = node::Buffer::Length(BufObj);
-    T* T_Data = (T*)(BufData);
     std::array<T,size> T_arr; 
-    for( int i = 0; i < (BufLength / sizeof(T)); i++)
-        T_arr[i] = T_Data[i];   
+    Nan::HandleScope scope;
+    v8::Handle<v8::Value> val;
+    
+    if (info[slot]->IsArray()) {
+        v8::Handle<v8::Array> jsArray = v8::Handle<v8::Array>::Cast(info[slot]);
+        if( jsArray->Length() != size )
+            Nan::ThrowRangeError("Array must be of fixed length.");
+        for (unsigned int i = 0; i < jsArray->Length(); i++) {
+            val = jsArray->Get(i);
+            T_arr[i] = val->NumberValue();
+        }
+    }
+    else {
+        v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+        char*         BufData   = node::Buffer::Data(BufObj);
+        size_t        BufLength = node::Buffer::Length(BufObj);
+        T* T_Data = (T*)(BufData);
+        if( (BufLength / sizeof(T)) != size )
+            Nan::ThrowRangeError("Array must be of fixed length.");
+        for( int i = 0; i < (BufLength / sizeof(T)); i++)
+            T_arr[i] = T_Data[i];
+    }
     return T_arr;
 }
 
@@ -77,7 +106,11 @@ void Legacy_Cutter::Init(v8::Local<v8::Object> exports) {
   // Prototype
   Nan::SetPrototypeMethod(tpl,  "ParseFile",  __ParseFile);
   Nan::SetPrototypeMethod(tpl,  "Incise",  __makeIncision);
-  
+  Nan::SetPrototypeMethod(tpl,  "GetJS_Vertex", __GetJavascriptVertex);
+  Nan::SetPrototypeMethod(tpl,  "GetJS_Topology", __GetJavascriptTopology);
+  Nan::SetPrototypeMethod(tpl,  "GetJS_UV", __GetJavascriptUV);
+  Nan::SetPrototypeMethod(tpl,  "GetRaw_Vertex",__GetRawVertex);
+  Nan::SetPrototypeMethod(tpl,  "GetRaw_Topology",__GetRawTopology);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Legacy_Cutter").ToLocalChecked(), tpl->GetFunction());
@@ -123,6 +156,61 @@ void Legacy_Cutter::__makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& 
     bool edge_end = info[5]->BooleanValue();
 
     obj->CreateIncision( path_triangles, path_uvs, path_positions, path_normals, edge_start, edge_end);
+}
+
+void Legacy_Cutter::__GetJavascriptVertex( const Nan::FunctionCallbackInfo<v8::Value>& info )
+{
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+
+    std::vector<int> tris;
+    std::vector<float> verts;
+    std::vector<float> uvs;
+    obj->_sg->getJavascriptData(tris,verts,uvs);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(verts.data()),
+                                              verts.size()*sizeof(float)).ToLocalChecked());
+}
+
+void Legacy_Cutter::__GetJavascriptTopology( const Nan::FunctionCallbackInfo<v8::Value>& info )
+{
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+
+    std::vector<int> tris;
+    std::vector<float> verts;
+    std::vector<float> uvs;
+    obj->_sg->getJavascriptData(tris,verts,uvs);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(tris.data()),
+                                              tris.size()*sizeof(int)).ToLocalChecked());
+}
+
+void Legacy_Cutter::__GetJavascriptUV( const Nan::FunctionCallbackInfo<v8::Value>& info )
+{
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+
+    std::vector<int> tris;
+    std::vector<float> verts;
+    std::vector<float> uvs;
+    obj->_sg->getJavascriptData(tris,verts,uvs);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(uvs.data()),
+                                              uvs.size()*sizeof(float)).ToLocalChecked());
+}
+
+
+void Legacy_Cutter::__GetRawVertex( const Nan::FunctionCallbackInfo<v8::Value>& info )
+{
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+    trianglesUVW *tri = obj->_sg->getTrianglesUVW();
+    std::vector<float> *verts = tri->getPositionArray();
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(verts->data()),
+                                              verts->size()*sizeof(float)).ToLocalChecked());
+}
+
+void Legacy_Cutter::__GetRawTopology( const Nan::FunctionCallbackInfo<v8::Value>& info )
+{
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+    trianglesUVW *tri = obj->_sg->getTrianglesUVW();
+    std::vector<int> *tris = tri->getTriangleArray();
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(tris->data()),
+                                              tris->size()*sizeof(int)).ToLocalChecked());
 }
 
 

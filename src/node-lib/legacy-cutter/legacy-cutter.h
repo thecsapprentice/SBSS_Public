@@ -32,6 +32,15 @@ class Legacy_Cutter : public Nan::ObjectWrap {
   
   static void __ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& info );
+
+  static void __GetJavascriptVertex( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  static void __GetJavascriptTopology( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  static void __GetJavascriptUV( const Nan::FunctionCallbackInfo<v8::Value>& info );
+
+  static void __GetRawVertex( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  static void __GetRawTopology( const Nan::FunctionCallbackInfo<v8::Value>& info );
+
+
   
   // Members
   incision* _incis;
