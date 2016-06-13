@@ -11,21 +11,9 @@ add_library(CLEjs SHARED
 # Gives our library file a .node extension without any "lib" prefix
 set_target_properties(CLEjs PROPERTIES PREFIX "" SUFFIX ".node")
 
-# Essential include files to build a node addon,
-# You should add this line in every CMake.js based project
-target_include_directories(CLEjs PRIVATE ${CMAKE_JS_INC})
-target_include_directories(CLEjs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/node_modules/nan/ )
-#target_include_directories(CLEjs PRIVATE node_modules/nan/ )
-target_include_directories(CLEjs PRIVATE /usr/include/node/ )
-target_include_directories(CLEjs PRIVATE /nobackup.1/SOFTWARE/include/node/ )
 target_include_directories(CLEjs PRIVATE ../../lib/ )
 
-
-add_custom_target(CLEjs_node_modules ALL
-                  COMMAND npm install nan
-                  COMMENT "Checking out NaN for native Nodejs compilation..." )
-
-add_dependencies(CLEjs CLEjs_node_modules)
+add_dependencies(CLEjs native-modules-prebuild)
 
 # Essential library files to link to a node addon
 # You should add this line in every CMake.js based project
@@ -51,3 +39,6 @@ target_link_libraries(CLEjs
   boost_system
   boost_thread
   )
+
+install( TARGETS CLEjs
+  LIBRARY DESTINATION share/sbss/node_modules )

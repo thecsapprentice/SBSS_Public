@@ -1,6 +1,8 @@
 // Dependencies
 var request = require('request');
 var async = require('async');
+var LegacyCutter = require('legacy_cutter');
+
 var TriangulatedSurface = require('./surface_object.js')
 
 // Code 
