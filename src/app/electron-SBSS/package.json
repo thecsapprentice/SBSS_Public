@@ -27,14 +27,10 @@
     "url": "https://github.com/atom/electron-quick-start/issues"
   },
   "homepage": "https://github.com/atom/electron-quick-start#readme",
-  "devDependencies": {
-    "electron-prebuilt": "^0.36.0",
-    "electron-rebuild": "^1.1.5",
+  "dependencies": {
+    "async": "~2.0.0-rc.6",
     "express": "*",
     "request": "*",
     "ws": "*"
-  },
-  "dependencies": {
-    "async": "~2.0.0-rc.6"
   }
 }

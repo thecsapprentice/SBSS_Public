@@ -348,7 +348,7 @@ ModelScene.prototype.AddTexture = function(name, data){
     if( name in this.textures )
         return;
     var scene_texture = {
-        texture_path: "static/data/"+data.data
+        texture_path: "http://localhost:8081/texture/"+data.data
     }
     this.textures[name] = scene_texture;
     //scene_texture.image = document.createElement( 'img' );

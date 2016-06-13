@@ -45,3 +45,5 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/electron-v${electron_version}/  DE
   PATTERN "electron-v${electron_version}.zip" EXCLUDE
   REGEX "~$" EXCLUDE
   )
+
+install(SCRIPT "./install_node_packages.cmake")

@@ -14,7 +14,7 @@ function SBSS_Simulation(){
 SBSS_Simulation.prototype.Initialize = function(options){
     var self = this
     self.server = options.server;
-
+    self.cutter = new LegacyCutter.Legacy_Cutter()
 }
 
 SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
@@ -70,6 +70,7 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
         self.server.RegisterTextureResource( scene.textureFiles[texture], texture );
     }
           
+    
     var dynamic_model = new TriangulatedSurface()
     var ret = dynamic_model.LoadFromBuffer( model_data[0] ); // Assume first model is the dynamic one
     if( ret )
@@ -78,6 +79,10 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
         callback( "Failed to parse and load dynamic model." );
         return;
     }
+    
+
+    self.cutter.ParseFile(model_data[0]);
+    //console.log( new Float32Array(self.cutter.GetJS_Vertex().buffer) )
     
     var dyn_texture;
     var dyn_normals;
@@ -104,7 +109,7 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
 
     
     self.server.UpdateDynamicData(dynamic_model.Flatten("topology"),
-                                  dynamic_model.Flatten("vertex"),                                   
+                                  new Float32Array(self.cutter.GetJS_Vertex().buffer), //dynamic_model.Flatten("vertex"),                                   
                                   dynamic_model.Flatten("uv"))
     self.server.SetTextureName(dyn_texture)
     self.server.SetNormalName(dyn_normals)
