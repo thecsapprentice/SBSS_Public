@@ -22,11 +22,11 @@ MasterScene.prototype.initialize = function() {
     this.camera.position.z = 0.5;
 
     // FPS Meter
-    this.stats = new Stats();
-    this.stats.domElement.style.bottom = '0px';
-    this.stats.domElement.style.right = '0px';
-    this.stats.domElement.style.zIndex = 100;
-    this.container.appendChild( this.stats.domElement );
+    //this.stats = new Stats();
+    //this.stats.domElement.style.bottom = '0px';
+    //this.stats.domElement.style.right = '0px';
+    //this.stats.domElement.style.zIndex = 100;
+    //this.container.appendChild( this.stats.domElement );
 
     // RENDERER
     if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -44,7 +44,7 @@ MasterScene.prototype.initialize = function() {
 
     // CONTROLS
     this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
-    this.controls.rotateSpeed = 1.0;
+    this.controls.rotateSpeed = 5.0;
     this.controls.zoomSpeed = 1.2;
     this.controls.panSpeed = 0.8;
     this.controls.noZoom = false;
@@ -147,7 +147,7 @@ MasterScene.prototype.render = function(timestamp) {
 
 MasterScene.prototype.update = function(timestamp){
     this.controls.update();
-    this.stats.update();
+    //this.stats.update();
     //if( !connected ){
     //    $("#connection_status").html("SIMULATOR OFFLINE");
     //    connectionNextTime -= timestamp - last_render_timestamp;

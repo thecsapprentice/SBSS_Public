@@ -19,7 +19,8 @@ SBSS_Service.prototype.Initialize = function( options ){
         server: self.server
     });
     self.director.Initialize({
-        simulation: self.simulation
+        simulation: self.simulation,
+        server: self.server
     });
     self.server.Initialize({
         port:options.port,

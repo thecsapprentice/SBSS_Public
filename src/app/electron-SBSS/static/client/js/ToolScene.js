@@ -71,17 +71,17 @@ ToolScene.prototype.initialize = function(){
     this.hook_geometry.computeVertexNormals();
     modifier.modify(this.hook_geometry); // Subdivide for smoothness!
     this.hook_geometry.normalsNeedUpdate = true;
-    this.hook_material = new THREE.MeshLambertMaterial( { color: 0xffff00, ambient: 0xeeee00, opacity: 0.8 } );
-    this.hook_selected_material = new THREE.MeshLambertMaterial( { color: 0x00ff00, ambient: 0x00ee00, opacity: 0.8 } );
+    this.hook_material = new THREE.MeshLambertMaterial( { color: 0xffff00, opacity: 0.8 } );
+    this.hook_selected_material = new THREE.MeshLambertMaterial( { color: 0x00ff00, opacity: 0.8 } );
     this.hook_mesh = new THREE.Mesh( this.hook_geometry, this.hook_material );
 
     // Build Suture Mesh
     var suture_sphere = new THREE.IcosahedronGeometry(1.0, 1);
     modifier.modify(suture_sphere);
     var suture_cylinder = new THREE.CylinderGeometry(1.0, 1.0, 1.0);
-    this.suture_material = new THREE.MeshLambertMaterial( { color: 0xffffee, ambient: 0xeeeedd, opacity: 0.8 } );
-    this.suture_selected_material = new THREE.MeshLambertMaterial( { color: 0x00ff00, ambient: 0x11ee11, opacity: 0.8 } );
-    this.suture_bad_material = new THREE.MeshLambertMaterial( { color: 0xff3333, ambient: 0xee1111, opacity: 0.8 } );
+    this.suture_material = new THREE.MeshLambertMaterial( { color: 0xffffee, opacity: 0.8 } );
+    this.suture_selected_material = new THREE.MeshLambertMaterial( { color: 0x00ff00, opacity: 0.8 } );
+    this.suture_bad_material = new THREE.MeshLambertMaterial( { color: 0xff3333, opacity: 0.8 } );
 
     this.suture_object = new THREE.Object3D();
     var smesh = new THREE.Mesh( suture_sphere, this.suture_material );

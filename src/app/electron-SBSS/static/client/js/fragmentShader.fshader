@@ -93,7 +93,6 @@ void getFat(in vec4 nei, out vec4 fatColor, out vec3 normDelta, out float specMu
         fatGreen = 0.35 + h*0.8; }
     fatColor = vec4(fatRed, fatGreen, fatBlue, 1.0); }
 
-#extension GL_OES_standard_derivatives : enable
 
 #define USE_MAP
 #define USE_NORMALMAP

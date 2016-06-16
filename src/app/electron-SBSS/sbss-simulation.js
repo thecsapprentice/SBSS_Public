@@ -51,13 +51,13 @@ SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
             fail_callback( "Failed to load some models. Loading scene can't continue!" )
         }
         else{
-            this._LoadScene_Phase2( scene, results, fail_callback );
+            this._LoadScene_Phase2( scene, object_fetch_list, results, fail_callback );
         }
     }.bind(this));
 
 }
 
-SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callback ){
+SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model_data, callback ){
     var self = this;
 
     // Scene paramters
@@ -99,6 +99,8 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
             continue // Skip! We've just done the dynamic stuff...
         var sm = self.cutter.ParseStaticFile( model_data[model_d] );
         console.log( "Loaded Static model." )
+        sm.texture = scene["fixedObjects"][model_list[model_d]].textureMap;
+        sm.normal = scene["fixedObjects"][model_list[model_d]].normalMap;
         static_models.push( sm );
     }   
     
@@ -116,8 +118,8 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
         self.server.AddStaticObject( Array.prototype.slice.call(new Uint32Array(elem.topology.buffer)),
                                      Array.prototype.slice.call(new Float32Array(elem.vertices.buffer)),
                                      Array.prototype.slice.call(new Float32Array(elem.uv.buffer)),
-                                     0,
-                                     0 );
+                                     elem.texture,
+                                     elem.normal );
     });
 
     self.server.UpdateData();    

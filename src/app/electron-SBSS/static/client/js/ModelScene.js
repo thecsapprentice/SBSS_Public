@@ -4,9 +4,12 @@
 //
 //
 
+var async = window.nodeRequire('async');
+
+
 var ModelScene = function(masterscene) {
     this.masterscene = masterscene;
-    this.loader = new THREE.ImageLoader();
+    this.loader = new THREE.TextureLoader();
 
     this.textures = {};
     this.static_meshes = [];
@@ -43,7 +46,9 @@ var ModelScene = function(masterscene) {
                                    this.masterscene.ambientLight.color.g,
                                    this.masterscene.ambientLight.color.b);
 
-    this.AddTexture( "ColorRamp", {data:"colorramp.png"} );
+    this.AddTexture( {name:"ColorRamp", path:{data:"colorramp.png"} }, function(err, result){
+        console.log( "Loaded ColorRamp." );
+    });
     var dummyRGBA = new Float32Array(256 * 256 * 3);
     for(var i=0; i< 256 * 256; i++){
         // RGB from 0 to 255
@@ -65,9 +70,13 @@ var ModelScene = function(masterscene) {
         "dataOverlayStrainRange": {type: "v2", value: new THREE.Vector2(1.0, 1.0) },
         "dataOverlayUseMagnitude" : {type: "i", value: 0 },
         "dataOverlaySelector" : {type: "i", value: 0 },
-        "dataColorRamp": { type: "t", value: THREE.ImageUtils.loadTexture( this.textures["ColorRamp"].texture_path ) },
+        "dataColorRamp": { type: "t", value: undefined },
         "dataTexture": {type: "t", value: this.data_texture }
     };
+
+    //this.loader.load( this.textures["ColorRamp"].texture_path, function(texture){
+    //   this.uniforms["dataColorRamp"].value = texture;
+    //}.bind(this));
 
 
 
@@ -103,8 +112,7 @@ ModelScene.prototype.initialize = function() {
     });
 
     this.clearScene();
-    this.grid_helper = new THREE.GridHelper( 10, 10 );
-    this.grid_helper.setColors( 0x0000ff, 0x808080 );
+    this.grid_helper = new THREE.GridHelper( 10, 10, 0x0000ff, 0x808080 );
     this.grid_helper.position.y = - 150;
     this.masterscene.scene.add( this.grid_helper );    
 }
@@ -144,16 +152,20 @@ ModelScene.prototype.processData = function(data) {
     //console.log( data );
     
     if( "textures" in data && !(data.textures === undefined)){
+        var texToLoad = []
         for( var texId in data.textures ){
-            this.AddTexture( texId, data.textures[texId] );
+            texToLoad.push( {name: texId, path: data.textures[texId] })
         }
+        async.map( texToLoad, this.AddTexture.bind(this), function( err, results ){
+            if( "dynamic" in data && !(data.dynamic === undefined))
+                this.ProcessObject( true, data.dynamic );
+            
+            if( "static" in data && !(data.static === undefined))
+                data.static.forEach(this.AddStaticObject.bind(this))   
+
+        }.bind(this));        
     }
 
-    if( "dynamic" in data && !(data.dynamic === undefined))
-       this.ProcessObject( true, data.dynamic );
-
-    if( "static" in data && !(data.static === undefined))
-        data.static.forEach(this.AddStaticObject.bind(this))   
 
 }
 
@@ -184,8 +196,13 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
         var indices = new Uint32Array( data.topology.length );
         for( var i = 0; i < data.topology.length; i++)
             indices[i] = data.topology[i];
-        geoNow.addAttribute( 'index', new THREE.BufferAttribute( indices, 3 ) );
+        geoNow.setIndex( new THREE.BufferAttribute( indices, 1 ) );
         geoNow.elementsNeedUpdate = true;
+    }
+    else{
+        var indices = new Uint32Array( 0 );
+        geoNow.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+        geoNow.elementsNeedUpdate = true;      
     }
     if( "uvs" in data ) {
         var uvs = new Float32Array( data.uvs.length );
@@ -194,10 +211,24 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
         geoNow.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
         geoNow.elementsNeedUpdate = true;
     }
+    else{
+        var uvs = new Float32Array( 0 );
+        geoNow.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+        geoNow.elementsNeedUpdate = true;
+    }
     if( "vertices" in data ) {
         var positions = new Float32Array( data.vertices.length );
         for( var i = 0; i <  data.vertices.length; i++)
             positions[i] = data.vertices[i];
+        geoNow.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+        geoNow.elementsNeedUpdate = true;
+        geoNow.computeVertexNormals();
+        geoNow.attributes.position.needsUpdate = true;
+        geoNow.attributes.normal.needsUpdate = true;   
+        signal_vertices = true;
+    }
+    else{
+        var positions = new Float32Array(0);
         geoNow.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
         geoNow.elementsNeedUpdate = true;
         geoNow.computeVertexNormals();
@@ -252,17 +283,22 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
                 //this.attributes["data_overlay"] = { type: 'v3', value: undefined }
                 //this.attributes["stress"] = { type: 'v3', value: undefined }
                 this.uniforms["map"] = { type: "t",
-                                         value: THREE.ImageUtils.loadTexture( this.textures[data.texturename].texture_path ) };
+                                         value: this.textures[data.texturename].data };
                 this.uniforms["normalMap"] = { type: "t",
-                                               value: THREE.ImageUtils.loadTexture( this.textures[data.normalname].texture_path ) };
+                                               value: this.textures[data.normalname].data };
+
+                
+                
                 this.uniforms.dataTexture.value = this.data_texture;
-                if( dynMaterial=== undefined )
+                if( dynMaterial=== undefined ){
                     dynMaterial = new THREE.ShaderMaterial( {
                         uniforms: this.uniforms,
-                        attributes: this.attributes,
                         vertexShader: this.vertexShader,
                         fragmentShader: this.dynamic_fragmentShader
                     });
+                    dynMaterial.extensions.derivatives = true;
+                }
+                
                 needGeoCleanup = true; 
             }
             else {
@@ -274,16 +310,16 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
                     "specular" : { type: "v3", value: new THREE.Vector3(0.06666666, 0.06666666, 0.06666666) },
                     "shininess" : { type: "f", value: 25.0 },
                     "normalScale" : { type: "v2", value: new THREE.Vector2(1.0, 1.0) },
-                    "map" : { type: "t", value: THREE.ImageUtils.loadTexture( this.textures[data.texturename].texture_path ) },
-                    "normalMap" : { type: "t", value: THREE.ImageUtils.loadTexture( this.textures[data.normalname].texture_path ) }
+                    "map" : { type: "t", value: this.textures[data.texturename].data },
+                    "normalMap" : { type: "t", value: this.textures[data.normalname].data }
                 };
                 
                 staticMaterial = new THREE.ShaderMaterial( {
                     uniforms: uniforms,
-                    attributes: this.attributes,
                     vertexShader: this.vertexShader,
                     fragmentShader: this.fragmentShader
-                });              
+                });
+                staticMaterial.extensions.derivatives = true;
                 var s = new THREE.Mesh( geoNow, staticMaterial);
                 this.masterscene.scene.add( s );
                 this.static_meshes.push( s );
@@ -344,29 +380,26 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
 //    return 0;
 }
 
-ModelScene.prototype.AddTexture = function(name, data){
-    if( name in this.textures )
+ModelScene.prototype.AddTexture = function(data,callback){
+    if( data.name in this.textures )
         return;
     var scene_texture = {
-        texture_path: "http://localhost:8081/texture/"+data.data
+        texture_path: "http://localhost:8081/texture/"+data.path.data
     }
-    this.textures[name] = scene_texture;
-    //scene_texture.image = document.createElement( 'img' );
-    //scene_texture.image.src = "/static/data/"+data.data;
-    //scene_texture.image.
-    //scene_texture.texture = new THREE.Texture( scene_texture.image );
-    //scene_texture.texture.needsUpdate = true;
-    //this.textures[name] = scene_texture;
-    //var maxPixel=0;
-    //var n=data.data.length;
-    //for(var i=0; i<n; ++i) {
-    //   if(maxPixel<data.data[i])
-    //       maxPixel = data.data[i];
-    //}
+    
+    this.loader.load( scene_texture.texture_path, function(texture){
+        scene_texture.data = texture;
+        this.textures[data.name] = scene_texture;
+        callback( null, scene_texture );    
+    }.bind(this));
+   
 }
 
 
 ModelScene.prototype.CollectSharpEdges = function(){
+    if( !( "index" in this.dynamic_geometry.attributes) )
+        return;
+        
     this.sharp_edge_hash = {};
 
     var sortFunction = function ( a, b ) { return a < b };

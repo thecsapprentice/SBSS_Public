@@ -1,3 +1,7 @@
+//#extension GL_OES_standard_derivatives : enable
+#define USE_MAP
+#define USE_NORMALMAP
+
 // Description : Array and textureless GLSL 2D & 3D simplex noise functions.
 //      Author : Ian McEwan, Ashima Arts.
 //  Maintainer : ijm
@@ -5,6 +9,8 @@
 //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
 //               Distributed under the MIT License. See LICENSE file.
 //               https://github.com/ashima/webgl-noise
+
+
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec2 mod289(vec2 x) {
@@ -93,10 +99,6 @@ void getFat(in vec4 nei, out vec4 fatColor, out vec3 normDelta, out float specMu
         fatGreen = 0.35 + h*0.8; }
     fatColor = vec4(fatRed, fatGreen, fatBlue, 1.0); }
 
-
-#extension GL_OES_standard_derivatives : enable
-#define USE_MAP
-#define USE_NORMALMAP
 
 uniform float dirIntensity;
 uniform vec3 diffuse;
@@ -260,4 +262,6 @@ void main() {
         vec3 smoothed_data = smoothstep( range.x, range.y, source.xyz );
         gl_FragColor.xyz = mix(smoothed_data, gl_FragColor.xyz, dataOverlayPercent);
     }
+
+
 }

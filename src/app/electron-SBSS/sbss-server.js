@@ -55,6 +55,13 @@ function StateData(){
     this.textures = {}
     
     this.textures_timestamp = 0;
+
+    this.Reset = function(){
+        this.dynamic = new Object();
+        this.staticobjects = []
+        this.textures = {}    
+        this.textures_timestamp = 0;
+    }
     
     this.maxTimestamp = function(){
         var max_timestamp = -1;
@@ -230,6 +237,15 @@ SBSS_Server.prototype.IncTimestamp = function() {
 SBSS_Server.prototype.VerifyClient = function(info){
 //    console.log( info )
     return true;
+}
+
+SBSS_Server.prototype.ResetConnections = function() {
+    var self = this;
+    self.globaltimestamp = 0;
+    self.state_data.Reset()
+    for( elem in self.connections ){
+        self.connections[elem].socket.close();
+    };
 }
 
 SBSS_Server.prototype.Initialize = function(options) {
