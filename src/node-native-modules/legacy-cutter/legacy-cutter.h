@@ -31,6 +31,7 @@ class Legacy_Cutter : public Nan::ObjectWrap {
   static Nan::Persistent<v8::Function> constructor;
   
   static void __ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  static void __ParseFileStatic( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& info );
 
   static void __GetJavascriptVertex( const Nan::FunctionCallbackInfo<v8::Value>& info );

@@ -175,9 +175,23 @@ SBSS_Server.prototype.SetNormalName = function( normname ){
     
 }
 
-SBSS_Server.prototype.AddStaticObject = function( topology, vertices, normals, uv, texname, normname ){
+SBSS_Server.prototype.AddStaticObject = function( topology, vertices, uv, texname, normname ){
+    var self=this
 
+    var s_obj = new Object();
+    s_obj.topology = topology.slice();
+    s_obj.vertices = vertices.slice();
+    s_obj.uvs = uv.slice();
+    s_obj.texturename = texname;
+    s_obj.normalname = normname;
 
+    s_obj.topology_timestamp = self.IncTimestamp();
+    s_obj.uvs_timestamp = s_obj.topology_timestamp
+    s_obj.vertices_timestamp = s_obj.topology_timestamp
+    s_obj.texturename_timestamp = s_obj.topology_timestamp;
+    s_obj.normalname_timestamp = s_obj.topology_timestamp;
+
+    self.state_data.staticobjects.push( s_obj );
 }
 
 SBSS_Server.prototype.RegisterTexture = function( name, data, length ){

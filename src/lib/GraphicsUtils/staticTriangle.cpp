@@ -966,18 +966,18 @@ void staticTriangle::getVertexCoordinate(unsigned int vertex, float (&xyz)[3])
 
 bool staticTriangle::setTextureFileCreateProgram(const char *topTxFile, const char *topNrmFile)
 {  // must be set first
-	if(_glslProgram>0)
-		return false;
-	std::vector<std::string> att;
-	att.assign(4,std::string());
-	att[0] = "vVertex";
-	att[1] = "vNormal";
-	att[2] = "vTangent";
-	att[3] = "vTexture";
-	bool ret = _wxg->addCustomSceneNode(this,topTxFile,topNrmFile,staticVertexShader,staticFragmentShader,att);
-	if(!ret)
-		return ret;
-	_wxg->getLightsShaders()->useGlslProgram(_glslProgram);  // must be current program. This routine sets other uniforms.
+	//if(_glslProgram>0)
+	//	return false;
+	//std::vector<std::string> att;
+	//att.assign(4,std::string());
+	//att[0] = "vVertex";
+	//att[1] = "vNormal";
+	//att[2] = "vTangent";
+	//att[3] = "vTexture";
+	//bool ret = _wxg->addCustomSceneNode(this,topTxFile,topNrmFile,staticVertexShader,staticFragmentShader,att);
+	//if(!ret)
+	//	return ret;
+	//_wxg->getLightsShaders()->useGlslProgram(_glslProgram);  // must be current program. This routine sets other uniforms.
 	//if(!_bufferObjects[0])
 	//	glGenBuffers(5, _bufferObjects);
 //	else	{  // COURT - is this necessary or can I just realloc in same objects?

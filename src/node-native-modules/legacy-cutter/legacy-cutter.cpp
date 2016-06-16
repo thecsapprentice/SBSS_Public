@@ -5,6 +5,8 @@
 
 #include "legacy-cutter.h"
 #include <GraphicsUtils/skinGraphics.h>
+#include <GraphicsUtils/staticTriangle.h>
+
 #include "incision.h"
 
 namespace {
@@ -105,6 +107,7 @@ void Legacy_Cutter::Init(v8::Local<v8::Object> exports) {
 
   // Prototype
   Nan::SetPrototypeMethod(tpl,  "ParseFile",  __ParseFile);
+  Nan::SetPrototypeMethod(tpl,  "ParseStaticFile",  __ParseFileStatic);
   Nan::SetPrototypeMethod(tpl,  "Incise",  __makeIncision);
   Nan::SetPrototypeMethod(tpl,  "GetJS_Vertex", __GetJavascriptVertex);
   Nan::SetPrototypeMethod(tpl,  "GetJS_Topology", __GetJavascriptTopology);
@@ -143,6 +146,41 @@ void Legacy_Cutter::__ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& inf
     obj->_incis->setPreferredEdgeLength(obj->_sg->getMeanEdgeTriangleLength());    
 }
 
+void Legacy_Cutter::__ParseFileStatic( const Nan::FunctionCallbackInfo<v8::Value>& info ){
+    Nan:: HandleScope scope;
+    v8::Local<v8::Object> results = Nan::New<v8::Object>();
+
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+    std::string tempString(*v8::String::Utf8Value(info[0]));
+    staticTriangle *tr = new staticTriangle();
+    if(tr->readObjFile(tempString.c_str()))
+        Nan::ThrowError("Unable to load fixed uvwTriangle .obj input file-");
+
+    std::vector<int> tris;
+    std::vector<float> verts;
+    std::vector<float> uvs;
+    tr->getSurfaceTriangles(tris);
+    tr->getSurfaceVertices(verts);
+    tr->getSurfaceUVs(uvs);
+
+    delete tr;
+
+    results->Set( Nan::New("vertices").ToLocalChecked(),
+                  Nan::CopyBuffer(reinterpret_cast<const char*>(verts.data()),
+                                  verts.size()*sizeof(float)).ToLocalChecked() );
+
+    results->Set( Nan::New("topology").ToLocalChecked(),
+                  Nan::CopyBuffer(reinterpret_cast<const char*>(tris.data()),
+                                  tris.size()*sizeof(int)).ToLocalChecked() );
+
+    results->Set( Nan::New("uv").ToLocalChecked(),
+                  Nan::CopyBuffer(reinterpret_cast<const char*>(uvs.data()),
+                                  uvs.size()*sizeof(float)).ToLocalChecked() );
+
+    info.GetReturnValue().Set( results );
+}
+
+
 void Legacy_Cutter::__makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& info ){
     Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
 
@@ -178,6 +216,8 @@ void Legacy_Cutter::__GetJavascriptTopology( const Nan::FunctionCallbackInfo<v8:
     std::vector<float> verts;
     std::vector<float> uvs;
     obj->_sg->getJavascriptData(tris,verts,uvs);
+    //for(int i=0; i< tris.size(); i++)
+    //    tris[i]--;
     info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(tris.data()),
                                               tris.size()*sizeof(int)).ToLocalChecked());
 }

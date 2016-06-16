@@ -97,22 +97,29 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_data, callb
     for( model_d in model_data ){
         if(model_d == 0)
             continue // Skip! We've just done the dynamic stuff...
-        var sm = new TriangulatedSurface();
-        var ret = sm.LoadFromBuffer( model_data[model_d] );
-        if( !ret )
-        {  callback( "Failed to parse and load static model: ", model_d );
-           return; }
+        var sm = self.cutter.ParseStaticFile( model_data[model_d] );
         console.log( "Loaded Static model." )
         static_models.push( sm );
-    }
+    }   
     
-
+    // Update Dynamic Model
     
-    self.server.UpdateDynamicData(dynamic_model.Flatten("topology"),
-                                  new Float32Array(self.cutter.GetJS_Vertex().buffer), //dynamic_model.Flatten("vertex"),                                   
-                                  dynamic_model.Flatten("uv"))
+    // This is really inefficient - we should move onto sending binary data directly to the client
+    self.server.UpdateDynamicData(Array.prototype.slice.call(new Uint32Array(self.cutter.GetJS_Topology().buffer)),
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_Vertex().buffer)), 
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_UV().buffer)))
     self.server.SetTextureName(dyn_texture)
     self.server.SetNormalName(dyn_normals)
+
+    // Update Static Models
+    static_models.forEach( function(elem, index){
+        self.server.AddStaticObject( Array.prototype.slice.call(new Uint32Array(elem.topology.buffer)),
+                                     Array.prototype.slice.call(new Float32Array(elem.vertices.buffer)),
+                                     Array.prototype.slice.call(new Float32Array(elem.uv.buffer)),
+                                     0,
+                                     0 );
+    });
+
     self.server.UpdateData();    
 }
 
