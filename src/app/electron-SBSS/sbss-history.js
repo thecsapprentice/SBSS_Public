@@ -33,6 +33,18 @@ SBSS_History.prototype.Push = function(new_command) {
         self.command_queue.push( new_command )
 }
 
+SBSS_History.prototype.TruncateAppend = function( new_command ){
+    var self = this
+    if( 'command' in new_command && 'data' in new_command ){
+        if( self.current_command > 0 )
+            if( self.current_command < self.command_queue.length )
+                self.command_queue.length = self.current_command;
+        self.command_queue.push( new_command )
+        self.current_command = self.command_queue.length;
+    }
+    
+}
+
 SBSS_History.prototype.CommandsRemaining = function(){
     var self = this;
     if( self.current_command >= self.command_queue.length ){

@@ -275,7 +275,7 @@ SBSS_Server.prototype.Initialize = function(options) {
             }
             console.log('(%s) received: %s', ws.id, message);
             if( 'command' in message && 'data' in message )
-                self.director.ProcessCommandMessage( message.command, message.data );
+                self.director.ProcessCommandMessage( message.command, message.data, true );
         });
         
         ws.on('close', function() {

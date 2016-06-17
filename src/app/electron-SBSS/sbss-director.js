@@ -15,7 +15,7 @@ SBSS_Director.prototype.Initialize = function(options){
     self.server = options.server;
 }
 
-SBSS_Director.prototype.ProcessCommandMessage = function( command, data ){
+SBSS_Director.prototype.ProcessCommandMessage = function( command, data, historyAppend ){
     var self = this
     console.log( "Handling command '%s'...", command );
     console.log( "With data:")
@@ -32,7 +32,7 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data ){
                 }
                 if( self.history.CommandsRemaining() > 0 ){
                     var cmd = self.history.Next();
-                    self.ProcessCommandMessage(cmd.command, cmd.data)
+                    self.ProcessCommandMessage(cmd.command, cmd.data, false)
                 }
             }});
         break
@@ -40,7 +40,7 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data ){
         self.history.List();
         if( self.history.CommandsRemaining() > 0 ){
             var cmd = self.history.Next();
-            self.ProcessCommandMessage(cmd.command, cmd.data)
+            self.ProcessCommandMessage(cmd.command, cmd.data, false)
         }
         else
             console.log( "History Advanced, but no commands remaining.")
@@ -51,6 +51,10 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data ){
                 scene_desc = JSON.parse(body)
                 self.LoadScene(scene_desc);
             }});
+        break;
+    case 'makeIncision':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.MakeIncision( data );
         break;
     }
 }
@@ -65,7 +69,29 @@ SBSS_Director.prototype.LoadScene = function(scene){
             console.log( error );                    
         }});
 }
-                             
+                         
+
+SBSS_Director.prototype.MakeIncision = function(data){
+    var self=this;
+    var path_triangles = []
+    var path_uv = []
+    var path_positions = []
+    var path_normals = []
+    
+    for( pathNode in data.path ){
+        path_triangles.push( data.path[pathNode].triangle );
+        path_uv.push( data.path[pathNode].coords[0] );
+        path_uv.push( data.path[pathNode].coords[1] );
+        path_positions.push( data.path[pathNode].position[0] );
+        path_positions.push( data.path[pathNode].position[1] );
+        path_positions.push( data.path[pathNode].position[2] );
+        path_normals.push( data.path[pathNode].normal[0] ); 
+        path_normals.push( data.path[pathNode].normal[1] ); 
+        path_normals.push( data.path[pathNode].normal[2] ); 
+    }
+
+    self.simulation.Incise( path_triangles, path_uv, path_positions, path_normals, data.edge_start, data.edge_end );
+}    
 
 
 // Exports

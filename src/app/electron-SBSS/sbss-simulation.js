@@ -125,6 +125,17 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
     self.server.UpdateData();    
 }
 
+SBSS_Simulation.prototype.Incise = function( path_triangles, path_uv, path_positions, path_normals, T_in, T_out ){
+    var self = this;
+
+    self.cutter.Incise( path_triangles, path_uv, path_positions, path_normals, T_in, T_out );
+    self.server.UpdateDynamicData(Array.prototype.slice.call(new Uint32Array(self.cutter.GetJS_Topology().buffer)),
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_Vertex().buffer)), 
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_UV().buffer)))
+    self.server.UpdateData();
+}
+
+
 
 
 // Exports

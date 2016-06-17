@@ -193,6 +193,19 @@ void Legacy_Cutter::__makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& 
     bool edge_start = info[4]->BooleanValue();
     bool edge_end = info[5]->BooleanValue();
 
+
+    std::cout << "Path: " << std::endl;
+    for( int i = 0 ; i < path_triangles.size(); i++ ){
+        std::cout << "Node " << i;
+        std::cout << " Triangle: " << path_triangles.at(i);
+        std::cout << " UV: " << path_uvs.at(i*2) << ", " << path_uvs.at(i*2+1);
+        std::cout << " Position: " << path_positions.at(i*3) << ", " << path_positions.at(i*3+1) << ", " << path_positions.at(i*3+2);
+        std::cout << " Position: " << path_normals.at(i*3) << ", " << path_normals.at(i*3+1) << ", " << path_normals.at(i*3+2);
+        std::cout << std::endl;
+    }
+    std::cout << "T_In: " << edge_start << std::endl;
+    std::cout << "T_Out: " << edge_end << std::endl;
+
     obj->CreateIncision( path_triangles, path_uvs, path_positions, path_normals, edge_start, edge_end);
 }
 

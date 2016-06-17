@@ -396,15 +396,12 @@ ModelScene.prototype.AddTexture = function(data,callback){
 }
 
 
-ModelScene.prototype.CollectSharpEdges = function(){
-    if( !( "index" in this.dynamic_geometry.attributes) )
-        return;
-        
+ModelScene.prototype.CollectSharpEdges = function(){       
     this.sharp_edge_hash = {};
 
     var sortFunction = function ( a, b ) { return a < b };
     var uvs = this.dynamic_geometry.attributes[ "uv" ].array;
-    var indices = this.dynamic_geometry.attributes[ "index" ].array;
+    var indices = this.dynamic_geometry.getIndex().array;
     var positions = this.dynamic_geometry.attributes[ "position" ].array;      
 
     var edge = [0,0];
@@ -490,7 +487,7 @@ ModelScene.prototype.IsEdgeSharp = function( edge ){
 }
 
 ModelScene.prototype.ClosestPointOnSharpEdge = function( point, radius, origin ){
-    var indices = this.dynamic_geometry.attributes[ "index" ].array;
+    var indices = this.dynamic_geometry.getIndex().array;
     var positions = this.dynamic_geometry.attributes[ "position" ].array;
 
     var searchbox = new THREE.Box3();
@@ -572,7 +569,7 @@ ModelScene.prototype.createSharpEdgeHelper = function( ) {
         this.sharpedge_helper.geometry.dispose();
         this.sharpedge_helper = null;
     }
-    var indices = this.dynamic_geometry.attributes[ "index" ].array;
+    var indices = this.dynamic_geometry.getIndex().array;
     var positions = this.dynamic_geometry.attributes[ "position" ].array;
 
     var geometry = new THREE.BufferGeometry();
@@ -602,7 +599,7 @@ ModelScene.prototype.DumpModelAsObj = function (){
 
     $("#model").empty()
     
-    var arr_index = this.dynamic_mesh.geometry.attributes[ "index" ].array;
+    var arr_index = this.dynamic_mesh.geometry.getIndex().array;
     var arr_normals = this.dynamic_mesh.geometry.attributes[ "normal" ].array;
     var arr_uv = this.dynamic_mesh.geometry.attributes[ "uv" ].array;
     var arr_position = this.dynamic_mesh.geometry.attributes[ "position" ].array;

@@ -815,8 +815,8 @@ ToolScene.prototype.EndKnife = function(complete) {
         knife_data = []
 
         var getPosition = function( dynGeometry, tri, uv ){
-            var indices = dynGeometry.attributes[ "index" ].array;
-            var positions = dynGeometry.attributes[ "position" ].array;
+            var indices = dynGeometry.getIndex().array;
+            var positions = dynGeometry.getAttribute( "position" ).array;
             vA = new THREE.Vector3().fromArray(positions, indices[tri*3+0]*3)
             vB = new THREE.Vector3().fromArray(positions, indices[tri*3+1]*3)
             vC = new THREE.Vector3().fromArray(positions, indices[tri*3+2]*3)
@@ -827,8 +827,8 @@ ToolScene.prototype.EndKnife = function(complete) {
             return result;
         }
 
-        var normals = this.masterscene.modelscene.dynamic_geometry.attributes[ "normal" ].array;
-        var indices = this.masterscene.modelscene.dynamic_geometry.attributes[ "index" ].array;
+        var normals = this.masterscene.modelscene.dynamic_geometry.getAttribute( "normal" ).array;
+        var indices = this.masterscene.modelscene.dynamic_geometry.getIndex().array;
         var normal = new THREE.Vector3();
         var position = new THREE.Vector3();
         var i,vNorm = new THREE.Vector3();
@@ -982,8 +982,8 @@ ToolScene.prototype.updateHooks = function() {
                         this.scaling_factor*0.12,
                         this.scaling_factor*0.12 );
         var normal = new THREE.Vector3();
-        var normals = this.masterscene.modelscene.dynamic_geometry.attributes[ "normal" ].array;
-        var indices = this.masterscene.modelscene.dynamic_geometry.attributes[ "index" ].array;
+        var normals = this.masterscene.modelscene.dynamic_geometry.getAttribute( "normal" ).array;
+        var indices = this.masterscene.modelscene.dynamic_geometry.getIndex().array;
         var i,vNorm = new THREE.Vector3();
         for (i = 0; i < 3; i ++ ) {
             vNorm.set(normals[indices[item.triangle*3+i]*3],normals[indices[item.triangle*3+i]*3+1],normals[indices[item.triangle*3+i]*3+2]);
@@ -1034,8 +1034,8 @@ ToolScene.prototype.updateSutures = function() {
 
     this.suture_data.forEach( function( item, index, array){
         var getPosition = function( dynGeometry, tri, uv ){
-            var indices = dynGeometry.attributes[ "index" ].array;
-            var positions = dynGeometry.attributes[ "position" ].array;
+            var indices = dynGeometry.getIndex().array;
+            var positions = dynGeometry.getAttribute( "position" ).array;
             var uv3 = new THREE.Vector3( 1.0 - (uv[0]+uv[1]), uv[0], uv[1] );
             vA = new THREE.Vector3().fromArray(positions, indices[tri*3+0]*3)
             vB = new THREE.Vector3().fromArray(positions, indices[tri*3+1]*3)
