@@ -135,6 +135,14 @@ SBSS_Simulation.prototype.Incise = function( path_triangles, path_uv, path_posit
     self.server.UpdateData();
 }
 
+SBSS_Simulation.prototype.Excise = function( triangle ){
+    var self=this
+    self.cutter.Excise( triangle );
+    self.server.UpdateDynamicData(Array.prototype.slice.call(new Uint32Array(self.cutter.GetJS_Topology().buffer)),
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_Vertex().buffer)), 
+                                  Array.prototype.slice.call(new Float32Array(self.cutter.GetJS_UV().buffer)))
+    self.server.UpdateData();
+}
 
 
 

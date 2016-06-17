@@ -109,6 +109,7 @@ void Legacy_Cutter::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "ParseFile",  __ParseFile);
   Nan::SetPrototypeMethod(tpl,  "ParseStaticFile",  __ParseFileStatic);
   Nan::SetPrototypeMethod(tpl,  "Incise",  __makeIncision);
+  Nan::SetPrototypeMethod(tpl,  "Excise",  __makeExcision);
   Nan::SetPrototypeMethod(tpl,  "GetJS_Vertex", __GetJavascriptVertex);
   Nan::SetPrototypeMethod(tpl,  "GetJS_Topology", __GetJavascriptTopology);
   Nan::SetPrototypeMethod(tpl,  "GetJS_UV", __GetJavascriptUV);
@@ -143,6 +144,7 @@ void Legacy_Cutter::__ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& inf
     if(_tuvw->readObjFile(tempString.c_str()))
         Nan::ThrowError("Unable to load fixed uvwTriangle .obj input file-");
     obj->_sg->setNewTopology();
+    obj->_incis->setIncisionWidth(0.0036);
     obj->_incis->setPreferredEdgeLength(obj->_sg->getMeanEdgeTriangleLength());    
 }
 
@@ -207,6 +209,16 @@ void Legacy_Cutter::__makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& 
     std::cout << "T_Out: " << edge_end << std::endl;
 
     obj->CreateIncision( path_triangles, path_uvs, path_positions, path_normals, edge_start, edge_end);
+}
+
+void Legacy_Cutter::__makeExcision( const Nan::FunctionCallbackInfo<v8::Value>& info ){
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+
+    typedef float T;
+
+    int triangle = info[0]->NumberValue();
+
+    obj->CreateExcision( triangle );
 }
 
 void Legacy_Cutter::__GetJavascriptVertex( const Nan::FunctionCallbackInfo<v8::Value>& info )
@@ -346,4 +358,29 @@ void Legacy_Cutter::CreateIncision( const std::vector<int>& path_triangles, cons
         Nan::ThrowError("Incision tool error. Not recoverable");
     
     _sg->setNewTopology();        
+}
+
+void Legacy_Cutter::CreateExcision( int triangle ){
+    trianglesUVW *_tuvw = _sg->getTrianglesUVW();
+    
+	_tuvw->findAdjacentTriangles();
+	recurseTriangleRemoval(triangle);
+	_tuvw->cleanAndPack();
+	_tuvw->findAdjacentTriangles();
+	_sg->setNewTopology();
+	_sg->updatePositionsAndNormals();
+}
+
+
+void Legacy_Cutter::recurseTriangleRemoval(int triangle)
+{
+    trianglesUVW *_tuvw = _sg->getTrianglesUVW();
+    
+	int *tp = _tuvw->triangleVertices(triangle);
+	if(*tp < 0)
+		return;
+	unsigned long *adjs = _tuvw->triAdjs(triangle);
+	*tp = -1;
+	for(int i=0; i<3; ++i)
+		recurseTriangleRemoval(adjs[i]>>2);
 }

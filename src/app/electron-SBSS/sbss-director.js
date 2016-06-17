@@ -56,6 +56,10 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
         if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
         self.MakeIncision( data );
         break;
+    case 'exciseRegion':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.MakeExcision( data );
+        break;
     }
 }
 
@@ -93,6 +97,11 @@ SBSS_Director.prototype.MakeIncision = function(data){
     self.simulation.Incise( path_triangles, path_uv, path_positions, path_normals, data.edge_start, data.edge_end );
 }    
 
+
+SBSS_Director.prototype.MakeExcision = function(data){
+    var self=this
+    self.simulation.Excise( data.triangle );
+}
 
 // Exports
 

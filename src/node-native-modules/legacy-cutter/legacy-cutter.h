@@ -24,7 +24,8 @@ class Legacy_Cutter : public Nan::ObjectWrap {
   void CreateIncision( const std::vector<int>& path_triangles, const std::vector<float>& path_uvs, 
                        const std::vector<float>& path_positions, const std::vector<float>& path_normals, 
                        const bool edge_start, const bool edge_end );
-      
+  void CreateExcision( int triangle );
+  void recurseTriangleRemoval(int triangle);
   
   // Wrapper methods
   static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
@@ -33,7 +34,8 @@ class Legacy_Cutter : public Nan::ObjectWrap {
   static void __ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __ParseFileStatic( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __makeIncision( const Nan::FunctionCallbackInfo<v8::Value>& info );
-
+  static void __makeExcision( const Nan::FunctionCallbackInfo<v8::Value>& info );
+  
   static void __GetJavascriptVertex( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __GetJavascriptTopology( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __GetJavascriptUV( const Nan::FunctionCallbackInfo<v8::Value>& info );

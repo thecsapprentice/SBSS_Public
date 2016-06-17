@@ -165,6 +165,13 @@ ModelScene.prototype.processData = function(data) {
 
         }.bind(this));        
     }
+    else{
+        if( "dynamic" in data && !(data.dynamic === undefined))
+            this.ProcessObject( true, data.dynamic );
+        
+            if( "static" in data && !(data.static === undefined))
+                data.static.forEach(this.AddStaticObject.bind(this))           
+    }
 
 
 }
