@@ -22,6 +22,13 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
     console.log( data )
     
     switch( command ){
+
+        /*
+
+          Scene and History Commands
+
+         */
+
     case 'loadHistory':
         request('http://localhost:8081/history/' + data.name, function (error, response, body) {
             if (!error && response.statusCode == 200) {
@@ -52,6 +59,13 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
                 self.LoadScene(scene_desc);
             }});
         break;
+
+        /*
+          
+          Cutting Commands
+
+         */
+       
     case 'makeIncision':
         if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
         self.MakeIncision( data );
@@ -59,6 +73,17 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
     case 'exciseRegion':
         if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
         self.MakeExcision( data );
+        break;
+
+        /*
+
+          Hook Commands
+
+          */
+
+    case 'addHook':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.AddHook( data );
         break;
     }
 }
@@ -101,6 +126,11 @@ SBSS_Director.prototype.MakeIncision = function(data){
 SBSS_Director.prototype.MakeExcision = function(data){
     var self=this
     self.simulation.Excise( data.triangle );
+}
+
+SBSS_Director.prototype.AddHook = function(data){
+    var self=this;
+    self.simulation.AddHook( data.triangle, data.coords );
 }
 
 // Exports

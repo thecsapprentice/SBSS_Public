@@ -2,7 +2,7 @@
 var request = require('request');
 var async = require('async');
 var LegacyCutter = require('legacy_cutter');
-
+var CLE = require('CLEjs');
 var TriangulatedSurface = require('./surface_object.js')
 
 // Code 
@@ -15,6 +15,14 @@ SBSS_Simulation.prototype.Initialize = function(options){
     var self = this
     self.server = options.server;
     self.cutter = new LegacyCutter.Legacy_Cutter()
+    self.physicsActive = false;
+    self.cle = new CLE.CLEjs();
+    self.hookStiffness = 1e4;
+    self.sutureStiffness = 1e5;
+    self.poissons_ratio = .45;
+    self.youngs_modulus = 1e3;
+    self.dx = 0.02;
+    self.refinement = 10;
 }
 
 SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
@@ -144,7 +152,65 @@ SBSS_Simulation.prototype.Excise = function( triangle ){
     self.server.UpdateData();
 }
 
+SBSS_Simulation.prototype.AddHook = function( triangle, hook_coords ){
+    var self=this
 
+    if(!self.physicsActive)
+        self.ReinitializeAndStartPhysics()
+    
+
+
+}
+
+SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
+    var self=this;
+
+    if(self.physicsActive)
+	self.cle.Destroy_Model();	// no need to destroy a non-existent model
+
+    var vertices = self.cutter.GetRaw_Vertex();
+    var topology = self.cutter.GetRaw_Topology();
+
+    self.cle.Set_Hook_Stiffness(self.hookStiffness);
+    self.cle.Set_Suture_Stiffness(self.sutureStiffness);
+    self.cle.Set_Poissons_Ratio(self.poissons_ratio);
+    self.cle.Set_Youngs_Modulus(self.youngs_modulus);
+    self.cle.Create_Model(vertices,topology,self.dx,self.refinement);    
+
+    // std::list<staticTriangle*>::iterator tit;
+    // for(tit=_triList.begin(); tit!=_triList.end(); ++tit)	{
+    //     std::vector<int> stris;
+    //     std::vector<float> sverts;
+    //     (*tit)->getTriangulatedSurface(sverts,stris);           
+    //     self.cle.Add_Static_Model(sverts,stris);
+    // }
+
+    // // INDEPENDENT fixed geometry input with scene load. Not necessarily related to an existing
+    // // vertex, line or triangle in the scene. Already computed, just output it.
+    // self.cle.Set_Fixed_Geometry(_fixedVerts,_fixedPoints,_fixedSegments,_fixedTriangles);
+
+    // for( int i = 0; i < _fixedRegions.size(); i++ ){
+    //     self.cle.Set_Fixed_Volume( _fixedRegions[i].first, _fixedRegions[i].second );
+    // }
+
+    // if( _fixedmeshVerts.size() > 0 ){
+    //     self.cle.Set_Fixed_Triangles(_fixedmeshVerts,_fixedmeshTriangles);  
+    // }
+
+    // // This is for collisions
+    // if(!_collisionTris.empty()){
+    //     self.cle.Set_Collision_Model(_collisionVerts,_collisionTris);
+    // }
+    
+    // for( int i = 0; i<_muscleVerts.size(); i++)
+    // {
+    //     self.cle.Add_Muscle_Layer( _muscleVerts[i], _muscleTris[i], _muscleFibers[i], _muscleMaxStress[i]  );
+    // }
+
+    self.cle.Finalize_Initialization();
+    self.physicsActive=true;
+    
+}
 
 // Exports
 

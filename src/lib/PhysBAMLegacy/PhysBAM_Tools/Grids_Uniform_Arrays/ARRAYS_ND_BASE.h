@@ -231,28 +231,28 @@ private:
 public:
 
     T& operator()(const int i,const int j,const int ij)
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
+    {STATIC_ASSERT(d==3);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
 
     const T& operator()(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
+    {STATIC_ASSERT(d==3);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
 
     T& operator()(const int i,const int j)
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
 
     const T& operator()(const int i,const int j) const
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
 
     T& operator()(const int i)
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
 
     const T& operator()(const int i) const
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);PHYSBAM_ASSERT(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
 
     T& operator()(const TV_INT& index)
-    {assert(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
+    {PHYSBAM_ASSERT(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
 
     const T& operator()(const TV_INT& index) const
-    {assert(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
+    {PHYSBAM_ASSERT(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
 
     bool Valid_Index(const TV_INT& index) const
     {return domain.Lazy_Inside(index);}
@@ -267,7 +267,7 @@ public:
     {STATIC_ASSERT(d==1);return domain.Lazy_Inside(TV_INT(i));}
 
     int Standard_Index(const TV_INT& index) const
-    {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner)+1;}
+    {PHYSBAM_ASSERT(Valid_Index(index));return Compute_Index(index-domain.min_corner)+1;}
 
     TV_INT Clamp(const TV_INT& i) const
     {return domain.Clamp(i);}
@@ -321,7 +321,7 @@ public:
     {STATIC_ASSERT(d==1);return a.domain==RANGE<TV_INT>(m_start,m_end);}
 
     static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<VECTOR<ELEMENT_OF_T,d> >& extracted_array,int dim)
-    {STATIC_ASSERT(IS_VECTOR<T>::value);assert(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
+    {STATIC_ASSERT(IS_VECTOR<T>::value);PHYSBAM_ASSERT(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
     for(int i=1;i<=old_array.array.m;i++) extracted_array.array(i)=old_array.array(i)(dim);}
 
     static void Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy)
@@ -397,7 +397,7 @@ public:
 private:
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,3> >& box)
-    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
+    {PHYSBAM_ASSERT(old_copy.Domain_Indices().Contains(box));PHYSBAM_ASSERT(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
     for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
         for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
@@ -406,7 +406,7 @@ private:
 
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,2> >& box)
-    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
+    {PHYSBAM_ASSERT(old_copy.Domain_Indices().Contains(box));PHYSBAM_ASSERT(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
     for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
         for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
@@ -414,7 +414,7 @@ private:
 
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,1> >& box)
-    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
+    {PHYSBAM_ASSERT(old_copy.Domain_Indices().Contains(box));PHYSBAM_ASSERT(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
     for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
         new_copy(i)=constant*old_copy(i);}

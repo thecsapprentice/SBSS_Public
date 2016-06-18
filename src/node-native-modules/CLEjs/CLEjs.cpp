@@ -158,6 +158,8 @@ void CLEjs::__Create_Model(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     double dx_in = info[2]->IsUndefined() ? 1.0 : info[2]->NumberValue();
     double refine_in = info[3]->IsUndefined() ? 1.0 : info[3]->NumberValue();
 
+    std::cout << "Create Model: " << vertex_in.size() / 3 << " Vertices, " << triangle_in.size() / 3 << " Triangles." << std::endl;
+
     obj->Create_Model( vertex_in, triangle_in, dx_in, refine_in );
 };
 

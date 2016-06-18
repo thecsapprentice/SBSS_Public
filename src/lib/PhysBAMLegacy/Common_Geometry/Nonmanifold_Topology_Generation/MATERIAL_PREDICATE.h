@@ -27,6 +27,7 @@ public:
     typedef REGULAR_HYPERCUBE_MESH<T,d> T_MESH;
     typedef typename REGULAR_HYPERCUBE_MESH<T,d>::T_CELL T_CELL;
 
+    virtual std::string Name() {return std::string("GENERIC MATERIAL PREDICATE"); };
     virtual void MaterialFragments(const T_MESH& mesh,const HASHTABLE<PAIR<VECTOR<int,2>,int> >& linkage_list,ARRAY<T_CELL>& sub_cells,HASHTABLE<int, int>& subcell_to_root_cell)=0;
     // Axis - the face/edge axis (x,y,z...)
     // High Cells - cell whose interesting face is on the positive axis side

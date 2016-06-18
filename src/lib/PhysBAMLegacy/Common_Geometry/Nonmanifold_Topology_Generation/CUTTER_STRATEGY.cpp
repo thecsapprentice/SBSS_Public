@@ -21,7 +21,10 @@ CUTTER_STRATEGY<T,d>::Reset( ){
 
 template<class T, int d> void
 CUTTER_STRATEGY<T,d>::Generate_Subcells(){
-    mp_instance->MaterialFragments(*mesh,*linkage_list,*subcells,*subcell_to_root_cell);
+    {
+        LOG::SCOPE scope("Exploring Material Fragments with Predicate: " + mp_instance->Name());
+        mp_instance->MaterialFragments(*mesh,*linkage_list,*subcells,*subcell_to_root_cell);
+    }
 
     root_cell_to_subcell->Clean_Memory();
     root_cell_to_subcell->Resize(mesh->elements.m);

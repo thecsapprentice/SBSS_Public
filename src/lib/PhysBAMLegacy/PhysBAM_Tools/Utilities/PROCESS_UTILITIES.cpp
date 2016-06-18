@@ -181,6 +181,17 @@ void Backtrace()
             // We're probably on a Mac, and the format is already reasonable.  Just print the whole line.
             LOG::cerr<<buffer;
 #endif
+            {
+                char syscom[256];
+                sprintf(syscom,"addr2line %p -e sighandler", stack_array[depth]);
+                FILE* fp2=popen(syscom,"r");
+                if(fp2){
+                    while(!feof(fp2) && fgets(buffer,buf_size-1,fp2)){
+                        LOG::cerr<<buffer;
+                    }
+                }
+            }
+
             depth+=1;
         }
         fclose(fp);}}
