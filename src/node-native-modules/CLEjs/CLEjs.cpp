@@ -3,28 +3,58 @@
 #include <vector>
 #include <array>
 
+
 namespace {
 template<class T>
 std::vector<T> load_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
-    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
-    char*         BufData   = node::Buffer::Data(BufObj);
-    size_t        BufLength = node::Buffer::Length(BufObj);
-    T* T_Data = (T*)(BufData);
-    std::vector<T> T_vec; T_vec.reserve( (BufLength / sizeof(T)) );
-    for( int i = 0; i < (BufLength / sizeof(T)); i++)
-        T_vec.push_back( T_Data[i] );   
+    std::vector<T> T_vec;
+    Nan::HandleScope scope;
+    v8::Handle<v8::Value> val;
+    
+    if (info[slot]->IsArray()) {
+        v8::Handle<v8::Array> jsArray = v8::Handle<v8::Array>::Cast(info[slot]);
+        for (unsigned int i = 0; i < jsArray->Length(); i++) {
+            val = jsArray->Get(i);
+            T_vec.push_back(val->NumberValue());
+        }
+    }
+    else{       
+        v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+        char*         BufData   = node::Buffer::Data(BufObj);
+        size_t        BufLength = node::Buffer::Length(BufObj);
+        T* T_Data = (T*)(BufData);
+        T_vec.reserve( (BufLength / sizeof(T)) );
+        for( int i = 0; i < (BufLength / sizeof(T)); i++)
+            T_vec.push_back( T_Data[i] );
+    }
     return T_vec;
 }
 
 template<class T, int size>
 std::array<T,size> load_std_array( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot ){
-    v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
-    char*         BufData   = node::Buffer::Data(BufObj);
-    size_t        BufLength = node::Buffer::Length(BufObj);
-    T* T_Data = (T*)(BufData);
     std::array<T,size> T_arr; 
-    for( int i = 0; i < (BufLength / sizeof(T)); i++)
-        T_arr[i] = T_Data[i];   
+    Nan::HandleScope scope;
+    v8::Handle<v8::Value> val;
+    
+    if (info[slot]->IsArray()) {
+        v8::Handle<v8::Array> jsArray = v8::Handle<v8::Array>::Cast(info[slot]);
+        if( jsArray->Length() != size )
+            Nan::ThrowRangeError("Array must be of fixed length.");
+        for (unsigned int i = 0; i < jsArray->Length(); i++) {
+            val = jsArray->Get(i);
+            T_arr[i] = val->NumberValue();
+        }
+    }
+    else {
+        v8::Local<v8::Object> BufObj    = info[slot]->ToObject();
+        char*         BufData   = node::Buffer::Data(BufObj);
+        size_t        BufLength = node::Buffer::Length(BufObj);
+        T* T_Data = (T*)(BufData);
+        if( (BufLength / sizeof(T)) != size )
+            Nan::ThrowRangeError("Array must be of fixed length.");
+        for( int i = 0; i < (BufLength / sizeof(T)); i++)
+            T_arr[i] = T_Data[i];
+    }
     return T_arr;
 }
 

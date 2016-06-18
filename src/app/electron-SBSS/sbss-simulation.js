@@ -157,8 +157,10 @@ SBSS_Simulation.prototype.AddHook = function( triangle, hook_coords ){
 
     if(!self.physicsActive)
         self.ReinitializeAndStartPhysics()
-    
 
+    var hook_id = self.cle.Add_Hook( triangle, hook_coords );
+
+    return ret;
 
 }
 

@@ -34,7 +34,7 @@ MaterialFragments(const T_MESH& mesh,
 
     PHYSBAM_ASSERT( mesh.elements.m == voxmap.m );
     int last_progress = 0;
-//#pragma omp parallel for shared(last_progress, mesh, linkage_list, vertex_counter, sub_cells, subcell_to_root_cell)
+#pragma omp parallel for shared(last_progress, mesh, linkage_list, vertex_counter, sub_cells, subcell_to_root_cell)
     for( int r = 1; r <= mesh.elements.m; r++ ){
         const VOXMAP& root_voxmap = voxmap( r );
 
