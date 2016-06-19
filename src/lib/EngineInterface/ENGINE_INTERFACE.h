@@ -78,7 +78,7 @@ namespace PhysBAM{
         virtual int CreateNewConstraint(CONSTRAINT_TYPE ctype) = 0;
         virtual void GetConstraint(CONSTRAINT_TYPE ctype, int cid, CONSTRAINT_SEGMENT<T,d>& cs) const = 0;
         virtual void SetConstraint(CONSTRAINT_TYPE ctype, int cid,  CONSTRAINT_SEGMENT<T,d>& cs) = 0;
-        virtual void RemoveConstraint(CONSTRAINT_TYPE ctype, int cid) = 0;
+        virtual void RemoveConstraint(CONSTRAINT_TYPE ctype, int& cid) = 0;
         virtual int NumberOfConstraints(CONSTRAINT_TYPE ctype) const = 0;
 
         virtual void GetCollisionConstants(ARRAY<T>& collision_constants) const = 0;

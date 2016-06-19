@@ -23,6 +23,20 @@ SBSS_Simulation.prototype.Initialize = function(options){
     self.youngs_modulus = 1e3;
     self.dx = 0.02;
     self.refinement = 10;
+    self.update_handle = undefined;
+}
+
+SBSS_Simulation.prototype.StartUpdates = function( ){
+    var self= this;
+    if( self.update_handle === undefined )
+        self.update_handle = setInterval( self.Update.bind( this ), 33 /* 30fps */ );
+}
+
+SBSS_Simulation.prototype.StopUpdates = function( ){
+    var self = this;
+    if(self.update_handle != undefined)
+        clearInterval( self.update_handle )
+    self.update_handle = undefined;
 }
 
 SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
@@ -158,10 +172,45 @@ SBSS_Simulation.prototype.AddHook = function( triangle, hook_coords ){
     if(!self.physicsActive)
         self.ReinitializeAndStartPhysics()
 
-    var hook_id = self.cle.Add_Hook( triangle, hook_coords );
+    self.cle.Add_Hook( triangle, hook_coords.slice() );
+    self.UpdateHooks();
+}
 
-    return ret;
+SBSS_Simulation.prototype.MoveHook = function( hook_id, location ){
+    var self=this;
 
+    if(!self.physicsActive)
+        return;
+
+    self.cle.Move_Hook( hook_id, location );
+    self.UpdateHooks();
+}
+
+SBSS_Simulation.prototype.DeleteHook = function( hook_id){
+    var self=this;
+
+    if(!self.physicsActive)
+        return;
+
+    self.cle.Delete_Hook( hook_id );
+    self.UpdateHooks();
+}
+
+SBSS_Simulation.prototype.UpdateHooks = function() {
+    var self=this;
+    var hook_ids = self.cle.Get_Active_Hooks();
+    var hook_positions = new Float32Array( self.cle.Get_Hook_Position(hook_ids).buffer )
+    var hook_triangles = new Int32Array( self.cle.Get_Hook_Triangles(hook_ids).buffer )
+    hook_ids = new Uint32Array(hook_ids.buffer)
+   
+    hooks = [];   
+    for( var i=0; i < hook_ids.length; i++ ){
+        if( hook_triangles[i] != -1 )
+            hooks.push( {"hook": hook_ids[i], "triangle": hook_triangles[i], "position": Array.prototype.slice.call( hook_positions, i*3, i*3+3 ) } );
+    }
+        
+    self.server.UpdateHooks( hooks );
+    self.server.UpdateData();
 }
 
 SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
@@ -212,6 +261,17 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     self.cle.Finalize_Initialization();
     self.physicsActive=true;
     
+}
+
+SBSS_Simulation.prototype.Update = function() {
+    var self = this;
+    
+    if( self.physicsActive ){
+        self.cle.Advance_One_Time_Step();
+
+
+    }
+
 }
 
 // Exports

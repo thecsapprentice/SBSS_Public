@@ -1,4 +1,4 @@
-SET(CPP11_FLAGS "-std=gnu++11 -fPIC -g")
+SET(CPP11_FLAGS "-std=gnu++11 -fPIC -g -O0")
 SET(OPENMP_FLAGS "-fopenmp")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CPP11_FLAGS} ${OPENMP_FLAGS}" )
 

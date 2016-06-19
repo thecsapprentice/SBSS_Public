@@ -25,6 +25,8 @@
 #include "COLLISION_INTERFACE.h"
 #include <Common/GENERIC_CELL.h>
 
+#include <map>
+
 namespace PhysBAM{
 
 template<class T,int d,bool enable_constraints, bool enable_muscles> class SKINNING_NONLINEAR_ELASTICITY;
@@ -121,6 +123,25 @@ class ELASTIC_LATTICE_DEFORMER:public EMBEDDED_DEFORMER_BASE
     ARRAY<T_INDEX> embedding_map;
     ARRAY<TV> embedding_weights;
 
+    struct SINGLE_POINT_CONSTRAINT{
+        int triangle; // Optional - Set to -1 if not associated with a triangle
+        int cid;      // Identifier into the fine constraint array
+    };
+
+    struct DUAL_POINT_CONSTRAINT{
+        int triangleA; // Optional - Set to -1 if not associated with a triangle
+        int triangleB; // Optional - Set to -1 if not associated with a triangle
+        int cid;      // Identifier into the fine constraint array
+    };
+
+    typedef std::map<int,SINGLE_POINT_CONSTRAINT> SINGLE_POINT_CONSTRAINT_MAP;
+    typedef std::map<int,DUAL_POINT_CONSTRAINT> DUAL_POINT_CONSTRAINT_MAP;
+    
+    SINGLE_POINT_CONSTRAINT_MAP single_point_constraint_map;
+    DUAL_POINT_CONSTRAINT_MAP dual_point_constraint_map;
+    int single_point_constraint_maxid;
+    int dual_point_constraint_maxid;
+    
     ARRAY<CONSTRAINT_SEGMENT<T,d> > fine_point_constraints;
     ARRAY<int> constraint_index_of_hook_id;
     ARRAY<int> constraint_index_of_suture_id;
@@ -180,6 +201,11 @@ public:
         constraint_index_of_hook_id.Clean_Memory();
         constraint_index_of_suture_id.Clean_Memory();
         fine_to_coarse_constraint.Clean_Memory();
+
+        single_point_constraint_map.clear();
+        dual_point_constraint_map.clear();
+        single_point_constraint_maxid = 0;
+        dual_point_constraint_maxid = 0;
     }
 
     void Initialize_Fine_Domain( T_INDEX cells, T dx, TV min_corner, int ratio,
@@ -243,9 +269,9 @@ public:
 //    TV Multilinear_Interpolation(const T_INDEX& cell_index,const TV& weights);  // We need these for embedded objects, but where do the objects live? Here or in Nonlinear?
 //    void Interpolate_Embedded_Object();
 
-    void Add_Discretization_Constraint(int cid);
+    int Add_Discretization_Constraint(const CONSTRAINT_SEGMENT<T,d>& constraint);
     void Update_Discretization_Constraint(int cid);
-    void Remove_Discretization_Constraint(int cid, int other_cid);
+    int Remove_Discretization_Constraint(int cid);
     void Initialize_Collision_Points();
 
     void SwapGeometryBuffers(){

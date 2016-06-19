@@ -48,6 +48,7 @@ struct CONSTRAINT_NODE
     };
 
     typedef enum {
+        EMBEDDED      = constraint_embedded,
         GRID_FIXED    = constraint_embedded,
         MESH_FIXED    = constraint_embedded|constraint_mesh,
         KINEMATIC     = constraint_kinematic,

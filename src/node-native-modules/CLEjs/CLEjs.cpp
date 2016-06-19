@@ -38,6 +38,7 @@ std::array<T,size> load_std_array( const Nan::FunctionCallbackInfo<v8::Value>& i
     
     if (info[slot]->IsArray()) {
         v8::Handle<v8::Array> jsArray = v8::Handle<v8::Array>::Cast(info[slot]);
+        std::cout.flush();
         if( jsArray->Length() != size )
             Nan::ThrowRangeError("Array must be of fixed length.");
         for (unsigned int i = 0; i < jsArray->Length(); i++) {
@@ -51,7 +52,7 @@ std::array<T,size> load_std_array( const Nan::FunctionCallbackInfo<v8::Value>& i
         size_t        BufLength = node::Buffer::Length(BufObj);
         T* T_Data = (T*)(BufData);
         if( (BufLength / sizeof(T)) != size )
-            Nan::ThrowRangeError("Array must be of fixed length.");
+            Nan::ThrowRangeError("Buffer must be of fixed length.");
         for( int i = 0; i < (BufLength / sizeof(T)); i++)
             T_arr[i] = T_Data[i];
     }
@@ -69,6 +70,8 @@ void save_std_vector( const Nan::FunctionCallbackInfo<v8::Value>& info, int slot
     for( int i = 0; i < T_vec.size(); i++)
         T_Data[i] = T_vec[i];   
 }
+
+    
 }
 
 void InitAll(v8::Local<v8::Object> exports) {
@@ -120,6 +123,9 @@ void CLEjs::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "Add_Hook",  __Add_Hook);
   Nan::SetPrototypeMethod(tpl,  "Move_Hook",  __Move_Hook);
   Nan::SetPrototypeMethod(tpl,  "Delete_Hook",  __Delete_Hook);
+  Nan::SetPrototypeMethod(tpl,  "Get_Hook_Position",  __Get_Hook_Position);
+  Nan::SetPrototypeMethod(tpl,  "Get_Hook_Triangles",  __Get_Hook_Triangles);
+  Nan::SetPrototypeMethod(tpl,  "Get_Active_Hooks",  __Get_Active_Hooks);
   Nan::SetPrototypeMethod(tpl,  "Add_Suture",  __Add_Suture);
   Nan::SetPrototypeMethod(tpl,  "Delete_Suture",  __Delete_Suture);
   Nan::SetPrototypeMethod(tpl,  "Advance_One_Time_Step",  __Advance_One_Time_Step);
@@ -380,12 +386,12 @@ void CLEjs::__Add_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
     if( info.Length() == 1 ){
         std::array<T,3> location = load_std_array<T,3>(info,0);      
-        ret = obj->Add_Hook( location );
+        ret = obj->Add_Single_Point_Constraint( location );
     }
     if( info.Length() == 2 ){
         int triangle_id_in = info[0]->NumberValue();
-        std::array<T,2> weights = load_std_array<T,2>(info,1);      
-        ret = obj->Add_Hook( triangle_id_in, weights );
+        std::array<T,3> location = load_std_array<T,3>(info,1);      
+        ret = obj->Add_Single_Point_Constraint( triangle_id_in, location );
     }
     
     info.GetReturnValue().Set(ret);    
@@ -396,14 +402,41 @@ void CLEjs::__Move_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     typedef float T;
     int hook_id_in = info[0]->NumberValue();
     std::array<T,3> location_in = load_std_array<T,3>(info,1);      
-    obj->Move_Hook( hook_id_in, location_in );
+    obj->Move_Single_Point_Constraint( hook_id_in, location_in );
 };
 
 void CLEjs::__Delete_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
     int hook_id_in = info[0]->NumberValue();
-    obj->Delete_Hook( hook_id_in );
+    obj->Delete_Single_Point_Constraint( hook_id_in );
 };
+
+void CLEjs::__Get_Hook_Position(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> hook_ids = load_std_vector<int>(info,0);
+    std::vector<std::array<float,3> > locations;
+    obj->Get_Single_Point_Constraint_Position( hook_ids, locations );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(locations.data()),
+                                              3*locations.size()*sizeof(float)).ToLocalChecked());
+};
+
+void CLEjs::__Get_Hook_Triangles(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> hook_ids = load_std_vector<int>(info,0);
+    std::vector< int > triangles;
+    obj->Get_Single_Point_Constraint_Triangles( hook_ids, triangles );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(triangles.data()),
+                                              triangles.size()*sizeof(int)).ToLocalChecked());
+};
+
+void CLEjs::__Get_Active_Hooks(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> hook_ids;
+    obj->Get_Active_Single_Point_Constraints(hook_ids);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(hook_ids.data()),
+                                              hook_ids.size()*sizeof(int)).ToLocalChecked());
+}
+
 
 void CLEjs::__Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());

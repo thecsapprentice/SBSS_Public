@@ -26,6 +26,8 @@ SBSS_Service.prototype.Initialize = function( options ){
         port:options.port,
         director: self.director
     });
+
+    self.simulation.StartUpdates();
 };
 
 

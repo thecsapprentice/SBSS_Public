@@ -59,9 +59,7 @@ Add_Embedded_Point_To_Fixed_Point_Spring_Constraint(const T spring_coefficient,c
     T_INDEX cell_index=fine_grid.Cell(embedded_point_material_space_location,0);
     PHYSBAM_ASSERT(unpadded_fine_domain.Lazy_Inside(cell_index));
 
-    int new_constraint_index=fine_point_constraints.Append(CONSTRAINT_SEGMENT<T,d>());
-    CONSTRAINT_SEGMENT<T,d>& new_constraint=fine_point_constraints(new_constraint_index);
-
+    CONSTRAINT_SEGMENT<T,d> new_constraint;
     new_constraint.is_reference = false;
 
     if( ! voxmap(cell_index) ){
@@ -70,7 +68,7 @@ Add_Embedded_Point_To_Fixed_Point_Spring_Constraint(const T spring_coefficient,c
         new_constraint.endpoints[1].type=CONSTRAINT_NODE<T,d>::KINEMATIC;
         new_constraint.endpoints[0].spatial_location()=TV();
         new_constraint.endpoints[1].spatial_location()=TV();
-        return new_constraint_index;
+        return Add_Discretization_Constraint(new_constraint);
     }
 
     TV multilinear_coordinates=(embedded_point_material_space_location-fine_grid.Node(cell_index))/h;
@@ -85,8 +83,8 @@ Add_Embedded_Point_To_Fixed_Point_Spring_Constraint(const T spring_coefficient,c
     new_constraint.endpoints[1].grid_index()=cell_index;
     new_constraint.endpoints[1].multilinear_coordinates() = multilinear_coordinates;
     new_constraint.spring_coefficient = spring_coefficient;
-    
-    return new_constraint_index;
+
+    return Add_Discretization_Constraint(new_constraint);
 }
 
 
@@ -109,9 +107,8 @@ Add_Two_Embedded_Point_Spring_Constraint(const T spring_coefficient,const TV& em
     PHYSBAM_ASSERT( voxmap(cell_index2) );
     TV multilinear_coordinates2=(embedded_point_material_space_location2-fine_grid.Node(cell_index2))/h;
     PHYSBAM_ASSERT(multilinear_coordinates2.Min()>-1e-4 && multilinear_coordinates2.Max()<1+1e-4);
-
-    int new_constraint_index=fine_point_constraints.Append(CONSTRAINT_SEGMENT<T,d>());
-    CONSTRAINT_SEGMENT<T,d>& new_constraint=fine_point_constraints(new_constraint_index);
+    
+    CONSTRAINT_SEGMENT<T,d> new_constraint;
     //LOG::cout << "Grid cell 1 " << cell_index1 << std::endl;
     //LOG::cout << "Grid cell 2 " << cell_index2 << std::endl;
 
@@ -124,17 +121,16 @@ Add_Two_Embedded_Point_Spring_Constraint(const T spring_coefficient,const TV& em
     new_constraint.endpoints[1].multilinear_coordinates() = multilinear_coordinates2;
     new_constraint.spring_coefficient = spring_coefficient;
     
-    return new_constraint_index;
+    return Add_Discretization_Constraint(new_constraint);
 
 }
 
 //#####################################################################
 //  Update_Discretization_Constraints
 //#####################################################################
-void ELASTIC_LATTICE_DEFORMER::
-Add_Discretization_Constraint(int cid)
+int ELASTIC_LATTICE_DEFORMER::
+Add_Discretization_Constraint(const CONSTRAINT_SEGMENT<T,d>& fine_constraint)
 {
-    const CONSTRAINT_SEGMENT<T,d>& fine_constraint = fine_point_constraints(cid);  
     if( fine_constraint.isSinglePoint() ){
         const T& spring_coefficient = fine_constraint.spring_coefficient;
         PHYSBAM_ASSERT( (fine_constraint.endpoints[1].type == CONSTRAINT_NODE<T,d>::GRID_FIXED) );
@@ -180,8 +176,7 @@ Add_Discretization_Constraint(int cid)
             discretization->SetConstraint(ENGINE_INTERFACE::DYNAMIC, coarse_cid, new_constraint);
         }
 
-        PHYSBAM_ASSERT( cid == coarse_cid );        
-        return;
+        return coarse_cid;
     }
 
     if( fine_constraint.isDualPoint() ){
@@ -269,8 +264,7 @@ Add_Discretization_Constraint(int cid)
             }
             discretization->SetConstraint(ENGINE_INTERFACE::DYNAMIC, coarse_cid, new_constraint);
         }
-        PHYSBAM_ASSERT( cid == coarse_cid );
-        return;
+        return coarse_cid;
     }
 
     // If all else fails, this must be a dummy constraint.
@@ -286,9 +280,8 @@ Add_Discretization_Constraint(int cid)
     new_constraint.endpoints[1].type=CONSTRAINT_NODE<T,d>::KINEMATIC;
     new_constraint.endpoints[1].spatial_location()=world_space_location;
     discretization->SetConstraint(ENGINE_INTERFACE::DYNAMIC, coarse_cid, new_constraint);
-    PHYSBAM_ASSERT( cid == coarse_cid );
-    return;
 
+    return coarse_cid;
 }
 
 
@@ -298,7 +291,7 @@ Add_Discretization_Constraint(int cid)
 void ELASTIC_LATTICE_DEFORMER::
 Update_Discretization_Constraint(int cid)
 {
-
+#if 0
     CONSTRAINT_SEGMENT<T,d>& fine_constraint = fine_point_constraints(cid);
     if( fine_constraint.isSinglePoint() ){
         TV world_space_location = fine_constraint.endpoints[0].spatial_location();
@@ -312,45 +305,19 @@ Update_Discretization_Constraint(int cid)
     else{
         PHYSBAM_FATAL_ERROR( "Can not update other types of constraints!" );
     }
-
+#endif
 }
 
 
 //#####################################################################
 //  Update_Discretization_Constraints
 //#####################################################################
-void ELASTIC_LATTICE_DEFORMER::
-Remove_Discretization_Constraint(int cid, int other_cid)
+int ELASTIC_LATTICE_DEFORMER::
+Remove_Discretization_Constraint(int cid)
 {
-/*
-    // Delete from old constraints.
-    ARRAY<POINT_CONSTRAINT<T,d> >& point_constraints=discretization->dynamic_point_constraints;
-    if(cid!=point_constraints.m){
-        int other_coarse_cid=point_constraints.m;
-        PHYSBAM_ASSERT(other_coarse_cid!=0);
-        PHYSBAM_ASSERT(other_cid == other_coarse_cid);
-        exchange(point_constraints(cid),point_constraints(other_coarse_cid));}
-    // Eliminate last constraint (and hook id)
-    point_constraints.Remove_End();
-*/
-    // Delete from new constraints.
-    #if 0
-    ARRAY<CONSTRAINT_SEGMENT<T,d> >& point_constraints = discretization->dynamic_point_constraints;
-    if(cid!=point_constraints.m){
-        int other_coarse_cid=point_constraints.m;
-        PHYSBAM_ASSERT(other_coarse_cid!=0);
-        PHYSBAM_ASSERT(other_cid == other_coarse_cid);
-        exchange(point_constraints(cid),point_constraints(other_coarse_cid));}
-    // Eliminate last constraint (and hook id)
-    point_constraints.Remove_End();
-    #else
-    discretization->RemoveConstraint( ENGINE_INTERFACE::DYNAMIC, cid );
-    #endif
-    // Check to be sure all constraints are consistent
-    //  PHYSBAM_ASSERT( point_constraints.m == fine_point_constraints.m );
-    //PHYSBAM_ASSERT( point_constraints.m == fine_point_constraints.m );
-    PHYSBAM_ASSERT( discretization->NumberOfConstraints(ENGINE_INTERFACE::DYNAMIC) == fine_point_constraints.m );
-
+    int new_cid = cid;
+    discretization->RemoveConstraint( ENGINE_INTERFACE::DYNAMIC, new_cid );  
+    return new_cid;
 }
 
 

@@ -71,6 +71,9 @@ class CLEjs : public Nan::ObjectWrap, public CLElib {
      static void __Add_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Move_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Delete_Hook(const Nan::FunctionCallbackInfo<v8::Value>& info);
+     static void __Get_Hook_Position(const Nan::FunctionCallbackInfo<v8::Value>& info);
+     static void __Get_Hook_Triangles(const Nan::FunctionCallbackInfo<v8::Value>& info);
+     static void __Get_Active_Hooks(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Delete_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Advance_One_Time_Step(const Nan::FunctionCallbackInfo<v8::Value>& info);

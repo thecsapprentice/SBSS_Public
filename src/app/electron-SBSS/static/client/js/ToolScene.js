@@ -550,7 +550,7 @@ ToolScene.prototype.findManipulatorSelection = function(){
             if( this.selected_hook != null )
                 this.selected_hook.material = this.hook_material;
             this.hooks[hook_index].material = this.hook_selected_material;
-            this.selected_hook_index = hook_index;
+            this.selected_hook_index = this.hooks[hook_index].hook_id;
             this.selected_hook = this.hooks[hook_index];
             this.selected_hook_position = new THREE.Vector3().copy( this.selected_hook.position );
         }
@@ -993,11 +993,12 @@ ToolScene.prototype.updateHooks = function() {
         var angle = rotation_vec.angleTo(normal);
         rotation_vec.cross(normal);
         rotation_vec.normalize();
-        hook.rotateOnAxis(rotation_vec, angle );
+         hook.rotateOnAxis(rotation_vec, angle );
+         hook.hook_id = item.id;
         this.hooks.push( hook );
     }.bind(this));
     this.hooks.forEach( function( item, index, array ){
-        if( index == this.selected_hook_index ){
+        if( item.hook_id == this.selected_hook_index ){
             this.selected_hook = item;
             this.selected_hook.position.copy( this.selected_hook_position );
             this.selected_hook.material = this.hook_selected_material;

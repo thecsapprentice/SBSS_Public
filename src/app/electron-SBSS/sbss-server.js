@@ -21,17 +21,17 @@ function Object(){
     this.JSONify = function(since){
         object_json_data = {}
 
-        if( this.topology_timestamp >= since )
+        if( this.topology_timestamp > since )
             object_json_data.topology = this.topology.slice();
-        if( this.vertices_timestamp >= since )
+        if( this.vertices_timestamp > since )
             object_json_data.vertices = this.vertices.slice();
-        if( this.normals_timestamp >= since )
+        if( this.normals_timestamp > since )
             object_json_data.normals = this.normals.slice();
-        if( this.uvs_timestamp >= since )
+        if( this.uvs_timestamp > since )
             object_json_data.uvs = this.uvs.slice();
-        if( this.texturename_timestamp >= since )
+        if( this.texturename_timestamp > since )
             object_json_data.texturename = this.texturename;
-        if( this.normalname_timestamp >= since )
+        if( this.normalname_timestamp > since )
             object_json_data.normalname = this.normalname;
         
         return object_json_data;
@@ -53,14 +53,18 @@ function StateData(){
     this.dynamic = new Object();
     this.staticobjects = []
     this.textures = {}
+    this.hooks = []
     
     this.textures_timestamp = 0;
+    this.hooks_timestamp = 0;
 
     this.Reset = function(){
         this.dynamic = new Object();
         this.staticobjects = []
+        this.hooks = []
         this.textures = {}    
         this.textures_timestamp = 0;
+        this.hooks_timestamp = 0;
     }
     
     this.maxTimestamp = function(){
@@ -69,6 +73,7 @@ function StateData(){
         for( obj in this.staticobjects )
             max_timestamp = Math.max( this.staticobjects[obj].maxTimestamp(), max_timestamp );
         max_timestamp = Math.max( this.textures_timestamp, max_timestamp );
+        max_timestamp = Math.max( this.hooks_timestamp, max_timestamp );
         return max_timestamp;
     }
 
@@ -77,19 +82,28 @@ function StateData(){
 
         console.log( "Dynamic Timestamp", this.dynamic.maxTimestamp() );
         
-        json_data.dynamic = {}
-        if( this.dynamic.maxTimestamp() >= since )
+        if( this.dynamic.maxTimestamp() > since ){
+            json_data.dynamic = {}
             json_data.dynamic = this.dynamic.JSONify( since );
+        }
 
-        json_data["static"] = []
+        static_objects = []
         for( obj in this.staticobjects )
-            if( this.staticobjects[obj].maxTimestamp() >= since )
-                json_data["static"].push( this.staticobjects[obj].JSONify(since) )
+            if( this.staticobjects[obj].maxTimestamp() > since )
+                static_objects.push( this.staticobjects[obj].JSONify(since) )
+        if(static_objects.length)
+            json_data["static"] = static_objects;
         
-        if( this.textures_timestamp >= since ){
+        if( this.textures_timestamp > since ){
             json_data["textures"] = {}
             for( obj in this.textures )
                 json_data["textures"][obj] = {'data':this.textures[obj]};
+        }
+
+        if( this.hooks_timestamp > since ){
+            json_data["hooks"] = []
+            for( hook in this.hooks )
+                json_data["hooks"][hook] = {'id': this.hooks[hook].id, 'triangle': this.hooks[hook].triangle, 'pos':this.hooks[hook].position };
         }
         
         json_data.timestamp = this.maxTimestamp();
@@ -124,8 +138,9 @@ SBSS_Server.prototype.UpdateClient = function(connectionID) {
     //Update Data on each connection if its revision is older than the current dataset
     console.log( "Connection", connectionID, "is at", self.connections[connectionID].revision );
     var connection_update = self.state_data.JSONify( self.connections[connectionID].revision )
-    //console.log( connection_update );
-    self.connections[connectionID].socket.send( JSON.stringify(connection_update) );
+    console.log( connection_update );
+    if( connection_update.timestamp > self.connections[connectionID].revision )
+        self.connections[connectionID].socket.send( JSON.stringify(connection_update) );
     self.connections[connectionID].revision = connection_update.timestamp;
     console.log( "Connection", connectionID, "is now at", self.connections[connectionID].revision );  
 }
@@ -212,7 +227,11 @@ SBSS_Server.prototype.RegisterTextureResource = function( name, resource ){
 }
 
 SBSS_Server.prototype.UpdateHooks = function( hook_data ){
-
+    var self = this;
+    self.state_data.hooks = []
+    for( hook in hook_data )
+        self.state_data.hooks.push( { 'id':hook_data[hook].hook, 'triangle':hook_data[hook].triangle, 'position':hook_data[hook].position } )
+    self.state_data.hooks_timestamp = self.IncTimestamp();    
 }
 
 SBSS_Server.prototype.UpdateSutures = function( suture_data ){

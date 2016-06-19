@@ -85,6 +85,17 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
         if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
         self.AddHook( data );
         break;
+
+    case 'moveHook':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.MoveHook( data );
+        break;
+
+    case 'deleteHook':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.DeleteHook( data );
+        break;
+        
     }
 }
 
@@ -131,6 +142,16 @@ SBSS_Director.prototype.MakeExcision = function(data){
 SBSS_Director.prototype.AddHook = function(data){
     var self=this;
     self.simulation.AddHook( data.triangle, data.coords );
+}
+
+SBSS_Director.prototype.MoveHook = function(data){
+    var self=this;
+    self.simulation.MoveHook( data.hook_id, data.coords );
+}
+
+SBSS_Director.prototype.DeleteHook = function(data){
+    var self=this;
+    self.simulation.DeleteHook( data.hook_id );
 }
 
 // Exports

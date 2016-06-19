@@ -403,7 +403,7 @@ SetConstraint(CONSTRAINT_TYPE ctype, int cid, CONSTRAINT_SEGMENT<T,d>& cs) {
 }
 
 void  ENGINE_INTERFACE_LOCAL::
-RemoveConstraint(CONSTRAINT_TYPE ctype, int cid) {
+RemoveConstraint(CONSTRAINT_TYPE ctype, int& cid) {
     if( engineCreated ){
         switch( ctype ){
         case DYNAMIC:
@@ -411,27 +411,36 @@ RemoveConstraint(CONSTRAINT_TYPE ctype, int cid) {
             if(cid!=point_constraints.m){
                 int other_cid=point_constraints.m;
                 PHYSBAM_ASSERT(other_cid!=0);
-                exchange(point_constraints(cid),point_constraints(other_cid));}
+                exchange(point_constraints(cid),point_constraints(other_cid));
+                cid = other_cid;
+            }
             // Eliminate last constraint (and hook id)
-            point_constraints.Remove_End();}
+            point_constraints.Remove_End();            
+            }
             break;
         case STATIC:
             {ARRAY<CONSTRAINT_SEGMENT<T,d> >& point_constraints = engine->static_point_constraints;
             if(cid!=point_constraints.m){
                 int other_cid=point_constraints.m;
                 PHYSBAM_ASSERT(other_cid!=0);
-                exchange(point_constraints(cid),point_constraints(other_cid));}
+                exchange(point_constraints(cid),point_constraints(other_cid));
+                cid = other_cid;                            
+            }
             // Eliminate last constraint (and hook id)
-            point_constraints.Remove_End();}
+            point_constraints.Remove_End();
+            }
             break;
         case COLLISION:
             {ARRAY<CONSTRAINT_SEGMENT<T,d> >& point_constraints = engine->collision_constraints;
             if(cid!=point_constraints.m){
                 int other_cid=point_constraints.m;
                 PHYSBAM_ASSERT(other_cid!=0);
-                exchange(point_constraints(cid),point_constraints(other_cid));}
+                exchange(point_constraints(cid),point_constraints(other_cid));
+                cid = other_cid;
+            }
             // Eliminate last constraint (and hook id)
-            point_constraints.Remove_End();}
+            point_constraints.Remove_End();
+            }
             break;
         }
     }
