@@ -59,11 +59,13 @@ Add_Embedded_Point_To_Fixed_Point_Spring_Constraint(const T spring_coefficient,c
     T_INDEX cell_index=fine_grid.Cell(embedded_point_material_space_location,0);
     PHYSBAM_ASSERT(unpadded_fine_domain.Lazy_Inside(cell_index));
 
+    LOG::cout << embedded_point_material_space_location << " " << cell_index << std::endl;
+
     CONSTRAINT_SEGMENT<T,d> new_constraint;
     new_constraint.is_reference = false;
 
     if( ! voxmap(cell_index) ){
-        //LOG::cout << "Adding a dummy constraint!" << std::endl;
+        LOG::cout << "Adding a dummy constraint!" << std::endl;
         new_constraint.endpoints[0].type=CONSTRAINT_NODE<T,d>::KINEMATIC;
         new_constraint.endpoints[1].type=CONSTRAINT_NODE<T,d>::KINEMATIC;
         new_constraint.endpoints[0].spatial_location()=TV();

@@ -90,6 +90,7 @@ struct Deviatoric_Piola_Kirchhoff_Stress_Tensor<NEOHOOKEAN_TAG,Tw,T_DATA,I_DATA>
 }
 };
 
+#if defined(BIPHASIC_SUPPORT)
 template<class Tw,class T_DATA,class I_DATA>
 struct Deviatoric_Piola_Kirchhoff_Stress_Tensor<BIPHASIC_TAG,Tw,T_DATA,I_DATA>
 {
@@ -144,12 +145,15 @@ struct Deviatoric_Piola_Kirchhoff_Stress_Tensor<BIPHASIC_TAG,Tw,T_DATA,I_DATA>
     Store(DevP_Hat[2], rDevPHat3);
 }
 };
+#endif
 
 #ifndef SUBROUTINE_Deviatoric_Piola_Kirchhoff_Stress_Tensor
 #define INSTANCE_KERNEL_Deviatoric_Piola_Kirchhoff_Stress_Tensor(WIDTH) WIDETYPE(float,WIDTH) (&DevP_Hat)[3],  const WIDETYPE(float,WIDTH) (&Sigma)[3], const WIDETYPE(float,WIDTH) (&mu) 
 INSTANCE_KERNEL_MATERIAL(Deviatoric_Piola_Kirchhoff_Stress_Tensor,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Deviatoric_Piola_Kirchhoff_Stress_Tensor,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Deviatoric_Piola_Kirchhoff_Stress_Tensor,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Deviatoric_Piola_Kirchhoff_Stress_Tensor
 #else
 }

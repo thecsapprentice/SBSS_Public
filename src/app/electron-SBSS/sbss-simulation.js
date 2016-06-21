@@ -4,7 +4,7 @@ var async = require('async');
 var LegacyCutter = require('legacy_cutter');
 var CLE = require('CLEjs');
 var TriangulatedSurface = require('./surface_object.js')
-
+var fs = require('fs');
 // Code 
 
 function SBSS_Simulation(){
@@ -222,6 +222,15 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     var vertices = self.cutter.GetRaw_Vertex();
     var topology = self.cutter.GetRaw_Topology();
 
+    
+    var verticesOut = fs.createWriteStream('model.vertices.bin');
+    verticesOut.write( Buffer.from( vertices.buffer ) );
+    verticesOut.end();
+
+    var topologyOut = fs.createWriteStream('model.topology.bin');
+    topologyOut.write( Buffer.from( topology.buffer ) );
+    topologyOut.end();
+    
     self.cle.Set_Hook_Stiffness(self.hookStiffness);
     self.cle.Set_Suture_Stiffness(self.sutureStiffness);
     self.cle.Set_Poissons_Ratio(self.poissons_ratio);
@@ -267,7 +276,7 @@ SBSS_Simulation.prototype.Update = function() {
     var self = this;
     
     if( self.physicsActive ){
-        self.cle.Advance_One_Time_Step();
+        //self.cle.Advance_One_Time_Step();
 
 
     }

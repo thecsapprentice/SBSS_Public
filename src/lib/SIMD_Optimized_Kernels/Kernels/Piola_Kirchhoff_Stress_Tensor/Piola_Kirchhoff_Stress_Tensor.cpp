@@ -90,7 +90,9 @@ void Run(T_DATA (&P_Hat)[3], const T_DATA (&Sigma)[3], const T_DATA (&Q_Hat)[3],
 #define INSTANCE_KERNEL_Piola_Kirchhoff_Stress_Tensor(WIDTH) WIDETYPE(float,WIDTH) (&P_Hat)[3],    const WIDETYPE(float,WIDTH) (&Sigma)[3],    const WIDETYPE(float,WIDTH) (&Q_Hat)[3],    const WIDETYPE(float,WIDTH) (&p),    const WIDETYPE(float,WIDTH) (&mu),    const WIDETYPE(float,WIDTH) (&alpha),    const WIDETYPE(float,WIDTH) (&kappa)
 INSTANCE_KERNEL_MATERIAL(Piola_Kirchhoff_Stress_Tensor, COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Piola_Kirchhoff_Stress_Tensor, NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Piola_Kirchhoff_Stress_Tensor, BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Piola_Kirchhoff_Stress_Tensor
 #else
 }

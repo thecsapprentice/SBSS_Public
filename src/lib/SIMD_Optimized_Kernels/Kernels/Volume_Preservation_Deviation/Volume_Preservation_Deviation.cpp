@@ -73,6 +73,7 @@ static inline void Run(T_DATA (&M), const T_DATA (&Sigma)[3])
 }
 };
 
+#if defined(BIPHASIC_SUPPORT)
 template<class Tw,class T_DATA,class I_DATA>
 struct Volume_Preservation_Deviation<BIPHASIC_TAG,Tw,T_DATA,I_DATA>
 {
@@ -105,11 +106,15 @@ static inline void Run(T_DATA (&M), const T_DATA (&Sigma)[3])
 };
 #endif
 
+#endif
+
 #ifndef SUBROUTINE_Volume_Preservation_Deviation
 #define INSTANCE_KERNEL_Volume_Preservation_Deviation(WIDTH) WIDETYPE(float,WIDTH) (&M), const WIDETYPE(float,WIDTH) (&Sigma)[3]
 INSTANCE_KERNEL_MATERIAL(Volume_Preservation_Deviation,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Volume_Preservation_Deviation,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Volume_Preservation_Deviation,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Volume_Preservation_Deviation
 #else
 }

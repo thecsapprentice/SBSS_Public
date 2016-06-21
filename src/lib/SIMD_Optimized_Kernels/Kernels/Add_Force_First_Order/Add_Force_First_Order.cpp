@@ -123,5 +123,7 @@ struct Add_Force_First_Order
                        WIDETYPE(float,WIDTH) (&q)
 INSTANCE_KERNEL_MATERIAL(Add_Force_First_Order,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Add_Force_First_Order,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Add_Force_First_Order,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Add_Force_First_Order

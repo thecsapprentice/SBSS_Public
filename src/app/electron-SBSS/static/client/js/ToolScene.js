@@ -65,7 +65,7 @@ ToolScene.prototype.initialize = function(){
     points.push( new THREE.Vector3(.1,0,0) );
     points.push( new THREE.Vector3(.3,0,1) );
     points.push( new THREE.Vector3(0,0,1) );
-    this.hook_geometry = new THREE.LatheGeometry( points, 8 );
+    this.hook_geometry = new THREE.IcosahedronGeometry(1.0, 1);//new THREE.LatheGeometry( points, 8 );
     this.hook_geometry.mergeVertices();
     this.hook_geometry.computeFaceNormals();
     this.hook_geometry.computeVertexNormals();
@@ -273,17 +273,19 @@ ToolScene.prototype.lockMode = function () {
     this.masterscene.toolsgui.setToolstate(-1);
 }
 
+ToolScene.prototype.updateKeyFlags = function(event){
+    this.keyflags.shift = event.shiftKey;
+    this.keyflags.ctrl = event.ctrlKey;
+    this.keyflags.alt = event.altKey;
+    this.keyflags.meta = event.metaKey;    
+}
+
 ToolScene.prototype.handleKeyDown = function( event ) {
     var mode = this.getMode();
     console.log( event );
     console.log( "Key Down ( " + event.key + "/" + event.keyIdentifier + " ), Mode: " + JSON.stringify(mode)  );
-
-    this.keyflags.shift = event.shiftKey;
-    this.keyflags.ctrl = event.ctrlKey;
-    this.keyflags.alt = event.altKey;
-    this.keyflags.meta = event.metaKey; 
+    this.updateKeyFlags(event);
    
-
     switch( mode.primary ){
     case -1: // This is the non-user interaction mode
         break;
@@ -326,19 +328,14 @@ ToolScene.prototype.handleKeyDown = function( event ) {
 ToolScene.prototype.handleKeyUp = function( event ) {
     var mode = this.getMode();
     console.log( "Key Up ( " + event.key +" ), Mode: " + JSON.stringify(mode)  );
-
-    this.keyflags.shift = event.shiftKey;
-    this.keyflags.ctrl = event.ctrlKey;
-    this.keyflags.alt = event.altKey;
-    this.keyflags.meta = event.metaKey;
-
+    this.updateKeyFlags(event);
 }
 
 
 ToolScene.prototype.handleMouseMove = function( event ) {
     var mode = this.getMode();
     console.log( "Mouse Move, Mode: " + JSON.stringify(mode)  );
-
+    this.updateKeyFlags(event);
     this.mouse.x = event.offsetX;
     this.mouse.y = event.offsetY;
 
@@ -387,7 +384,7 @@ ToolScene.prototype.handleMouseMove = function( event ) {
 ToolScene.prototype.handleMouseUp = function( event ) {
     var mode = this.getMode();
     console.log( "Mouse Up, Mode: " + JSON.stringify(mode)  );
-
+    this.updateKeyFlags(event);
     switch( mode.primary ){
     case -1: // This is the non-user interaction mode
         break;
@@ -426,7 +423,7 @@ ToolScene.prototype.handleMouseUp = function( event ) {
 ToolScene.prototype.handleMouseDown = function( event ) {
     var mode = this.getMode();
     console.log( "Mouse Down, Mode: " + JSON.stringify(mode)  );
-
+    this.updateKeyFlags(event);
     intersection = this.getIntersection( this.mouse, [ this.plane ] );
     if( intersection.position != null )
         this.offset.copy( intersection.position ).sub( this.plane.position );

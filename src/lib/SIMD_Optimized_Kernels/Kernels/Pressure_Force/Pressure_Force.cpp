@@ -64,7 +64,9 @@ void Run(T_DATA (&q), const T_DATA (&Sigma)[3], const T_DATA (&p), const T_DATA 
 #define INSTANCE_KERNEL_Pressure_Force(WIDTH) WIDETYPE(float,WIDTH) (&q),    const WIDETYPE(float,WIDTH) (&Sigma)[3],    const WIDETYPE(float,WIDTH) (&p),    const WIDETYPE(float,WIDTH) (&alpha),    const WIDETYPE(float,WIDTH) (&alpha_squared_over_kappa)
 INSTANCE_KERNEL_MATERIAL(Pressure_Force,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Pressure_Force,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Pressure_Force,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Pressure_Force
 #else
 }

@@ -64,7 +64,7 @@ using namespace PhysBAM;
 
 #define GRID_IN_GRID
 // Set to 1<<30 for full logging.
-#define LOG_DEPTH 6
+#define LOG_DEPTH 1<<30
 #define LOG_FILE "CLElib.log"
 
 template<class T>

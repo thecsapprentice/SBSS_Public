@@ -136,6 +136,7 @@ struct VTYPE_POLICY<float32x4_t>{
 
 struct COROTATED_TAG;
 struct NEOHOOKEAN_TAG;
+#if defined(BIPHASIC_SUPPORT)
 struct BIPHASIC_TAG;
 
 namespace nm_biphasic {
@@ -144,6 +145,7 @@ namespace nm_biphasic {
     //BUILD_CONSTANT( biphasic_threshold, 1.07f );
     //BUILD_CONSTANT( biphasic_factor, 1e4);
 }
+#endif
 
 template <class T, int width>
 struct widetype{

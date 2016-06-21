@@ -176,7 +176,9 @@ struct Update_Position_Based_State
 
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,BIPHASIC_TAG);
+#endif
 
 #undef INSTANCE_KERNEL_Update_Position_Based_State
 
@@ -202,6 +204,8 @@ INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,BIPHASIC_TAG);
 
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Update_Position_Based_State,BIPHASIC_TAG);
+#endif
 
 #undef INSTANCE_KERNEL_Update_Position_Based_State

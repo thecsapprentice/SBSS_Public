@@ -138,6 +138,7 @@ static inline void Run(T_DATA (&dPdF)[12], const T_DATA (&Sigma)[3], const T_DAT
 }
 };
 
+#if defined(BIPHASIC_SUPPORT)
 template<class Tw,class T_DATA,class I_DATA>
 struct Augmented_Rotated_Stress_Derivative<BIPHASIC_TAG,Tw,T_DATA,I_DATA>
 {
@@ -194,12 +195,15 @@ static inline void Run(T_DATA (&dPdF)[12], const T_DATA (&Sigma)[3], const T_DAT
     Store(dPdF[x2332],ra2332);
 }
 };
+#endif
 
 #ifndef SUBROUTINE_Augmented_Rotated_Stress_Derivative
 #define INSTANCE_KERNEL_Augmented_Rotated_Stress_Derivative(WIDTH) WIDETYPE(float,WIDTH) (&dPdF)[12],    const WIDETYPE(float,WIDTH) (&Sigma)[3],    const WIDETYPE(float,WIDTH) (&p),    const WIDETYPE(float,WIDTH) (&mu),    const WIDETYPE(float,WIDTH) (&alpha)
 INSTANCE_KERNEL_MATERIAL(Augmented_Rotated_Stress_Derivative, COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Augmented_Rotated_Stress_Derivative, NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Augmented_Rotated_Stress_Derivative, BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Augmented_Rotated_Stress_Derivative
 #else
 }

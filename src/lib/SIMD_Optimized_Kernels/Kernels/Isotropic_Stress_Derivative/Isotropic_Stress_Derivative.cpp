@@ -73,7 +73,9 @@ void Run(T_DATA (&dPdF)[12], const T_DATA (&Sigma)[3], const T_DATA (&p), const 
 #define INSTANCE_KERNEL_Isotropic_Stress_Derivative(WIDTH) WIDETYPE(float,WIDTH) (&dPdF)[12], const WIDETYPE(float,WIDTH) (&Sigma)[3],    const WIDETYPE(float,WIDTH) (&p),    const WIDETYPE(float,WIDTH) (&mu),    const WIDETYPE(float,WIDTH) (&kappa),    const WIDETYPE(float,WIDTH) (&alpha), const bool apply_definiteness_fix
 INSTANCE_KERNEL_MATERIAL(Isotropic_Stress_Derivative,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Isotropic_Stress_Derivative,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Isotropic_Stress_Derivative,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Isotropic_Stress_Derivative
 #else
 }

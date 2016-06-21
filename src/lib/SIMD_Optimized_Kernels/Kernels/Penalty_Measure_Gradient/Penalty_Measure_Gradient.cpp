@@ -63,7 +63,7 @@ static inline void Run(const T_DATA (&Sigma)[3], T_DATA (&Q_hat)[3])
     Store(Q_hat[2],rSigma3_inverse);
 }
 };
-
+#if defined(BIPHASIC_SUPPORT)
 template<class Tw,class T_DATA,class I_DATA>
 struct Penalty_Measure_Gradient<BIPHASIC_TAG,Tw,T_DATA,I_DATA>
 {
@@ -78,12 +78,15 @@ static inline void Run(const T_DATA (&Sigma)[3], T_DATA (&Q_hat)[3])
     Store(Q_hat[2],rone);
 }
 };
+#endif
 
 #ifndef SUBROUTINE_Penalty_Measure_Gradient
 #define INSTANCE_KERNEL_Penalty_Measure_Gradient(WIDTH)  const WIDETYPE(float,WIDTH) (&Sigma)[3],WIDETYPE(float,WIDTH) (&Q_hat)[3]
 INSTANCE_KERNEL_MATERIAL(Penalty_Measure_Gradient,COROTATED_TAG);
 INSTANCE_KERNEL_MATERIAL(Penalty_Measure_Gradient,NEOHOOKEAN_TAG);
+#if defined(BIPHASIC_SUPPORT)
 INSTANCE_KERNEL_MATERIAL(Penalty_Measure_Gradient,BIPHASIC_TAG);
+#endif
 #undef INSTANCE_KERNEL_Penalty_Measure_Gradient
 #else
 }

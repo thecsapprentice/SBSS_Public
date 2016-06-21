@@ -17,7 +17,9 @@
 
 struct NEOHOOKEAN_TAG;
 struct COROTATED_TAG;
+#if defined(BIPHASIC_SUPPORT)
 struct BIPHASIC_TAG;
+#endif
 struct __m256;
 struct __m128;
 #ifdef ENABLE_MIC
@@ -54,10 +56,12 @@ extern PTHREAD_QUEUE* pthread_queue;
 
 #ifdef USE_SPECIALIZED_KERNELS
 
+#if defined(BIPHASIC_SUPPORT)
 namespace nm_biphasic {
     float* biphasic_threshold=NULL ;
     float* biphasic_factor=NULL;
 }
+#endif
 
 namespace {
     template <class T_MATERIAL> struct T_MATERIAL_DESC { };
@@ -71,11 +75,12 @@ namespace {
     {
         typedef COROTATED_TAG T_MATERIAL;
     };
-
+#if defined(BIPHASIC_SUPPORT)
     template<> struct T_MATERIAL_DESC< PhysBAM::BIPHASIC<float, 3> >
     {
         typedef BIPHASIC_TAG T_MATERIAL;
     };
+#endif
 
     template <class T_ARCH> struct T_ARCH_DESC { };
 
@@ -194,10 +199,12 @@ namespace {
                 _muscle_activations(muscle_activations),
                 _specialized_data(specialized_data)
             {
+#if defined(BIPHASIC_SUPPORT)
                 if( nm_biphasic::biphasic_threshold == NULL )
                     nm_biphasic::biphasic_threshold = new float[SPECIALIZED_KERNEL_DATA<T,3>::VECTOR_WIDTH];
                 if( nm_biphasic::biphasic_factor == NULL )
                     nm_biphasic::biphasic_factor = new float[SPECIALIZED_KERNEL_DATA<T,3>::VECTOR_WIDTH];
+#endif
             }
 
 
@@ -210,6 +217,7 @@ void Run()
 
     STATIC_ASSERT(T_ARCH_DESC<T_ARCH>::T_DATA_SIZE == SPECIALIZED_KERNEL_DATA<T,3>::VECTOR_WIDTH);
 
+#if defined(BIPHASIC_SUPPORT)
     std::ifstream biphasic_params( "biphasic_parameters" );
     float bpt, bpf;
     biphasic_params >> bpt;
@@ -219,6 +227,7 @@ void Run()
         nm_biphasic::biphasic_factor[i] = bpf;
     }
     biphasic_params.close();
+#endif
 
     for( int _bundle = 0; _bundle < _bundle_count; _bundle++)
         {
