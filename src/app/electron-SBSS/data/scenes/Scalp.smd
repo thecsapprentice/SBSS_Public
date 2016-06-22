@@ -1,5 +1,7 @@
 {
-    "collisionObject" : "skullTemporalis_collision.obj",
+    "collisionObjects" : [
+        "skullTemporalis_collision.obj"
+    ],  
     "dynamicObjects" : {
         "scalpBagUVW.obj" : {
             "textureMap" : 1,

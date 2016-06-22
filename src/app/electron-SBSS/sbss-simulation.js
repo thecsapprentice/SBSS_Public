@@ -21,9 +21,14 @@ SBSS_Simulation.prototype.Initialize = function(options){
     self.sutureStiffness = 1e5;
     self.poissons_ratio = .45;
     self.youngs_modulus = 1e3;
+    self.incisionWidth = 0.002;
     self.dx = 0.02;
-    self.refinement = 10;
+    self.refinementRatio = 10;
     self.update_handle = undefined;
+    self.static_models = [];
+    self.fixed_geometry_models = [];
+    self.collision_models = [];
+    self.fixed_regions = [];
 }
 
 SBSS_Simulation.prototype.StartUpdates = function( ){
@@ -43,21 +48,37 @@ SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
     var self = this;
     console.log( "Loading scene...");
 
+    self.hookStiffness = 1e4;
+    self.sutureStiffness = 1e5;
+    self.poissons_ratio = .35;
+    self.youngs_modulus = 3e4;
+    self.incisionWidth = 0.002;
+    self.dx = 0.02;
+    self.refinementRatio = 3;
+
     object_fetch_list = []
     for( dynobj in scene.dynamicObjects ){
-        object_fetch_list.push( dynobj )
+        object_fetch_list.push( {'name':dynobj, 'type':"dynamic"} )
         break;
     }
     if( 'fixedObjects' in scene ){
         for( fixedobj in scene.fixedObjects ){
-            object_fetch_list.push( fixedobj )
+            object_fetch_list.push( {'name':fixedobj, 'type':"static"} )
         }        
+    }
+    if( 'fixedGeometry' in scene )
+        if( 'mesh' in scene.fixedGeometry )
+            object_fetch_list.push( {'name':scene.fixedGeometry.mesh, 'type' : "fixed" } )
+                
+    if( 'collisionObjects' in scene ){
+        for( item in scene.collisionObjects )
+            object_fetch_list.push( {'name':scene.collisionObjects[item], 'type' : "collision" } )
     }
 
     console.log( "Fetching models..." )
 
     function wrapped_model_request(item, callback){
-        request( 'http://localhost:8081/model/' + item, function(error, response, body ){
+        request( 'http://localhost:8081/model/' + item.name, function(error, response, body ){
             if (!error && response.statusCode == 200) {
                 callback( null, body );
             }
@@ -83,28 +104,38 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
     var self = this;
 
     // Scene paramters
-    var incisionWidth = scene.incisionWidth;
-    var physicsDx     = scene.physicsNodeSpacing;
+    if( 'refinementRatio' in scene )
+        self.refinementRatio = scene.refinementRatio;
+    if( 'incisionWidth' in scene )
+        self.incisionWidth = scene.incisionWidth;
+    if( 'physicsNodeSpacing' in scene )
+        self.dx    = scene.physicsNodeSpacing;
+    if( 'hookStiffness' in scene )
+        self.hookStiffness = scene.hookStiffness;
+    if( 'sutureStiffness' in scene )
+        self.sutureStiffness = scene.sutureStiffness;
     
+    
+
+
     // Textures
     for( texture in scene.textureFiles ){
         console.log( "Loading texture", texture, "into slot", scene.textureFiles[texture] );
         self.server.RegisterTextureResource( scene.textureFiles[texture], texture );
     }
           
-    
-    var dynamic_model = new TriangulatedSurface()
-    var ret = dynamic_model.LoadFromBuffer( model_data[0] ); // Assume first model is the dynamic one
-    if( ret )
-        console.log( "Loaded Dynamic model." )
-    else{
-        callback( "Failed to parse and load dynamic model." );
-        return;
+  
+    var dynamic_model_index = -1;
+    for( item in model_list ){
+        if( model_list[item].type == 'dynamic' ){
+            dynamic_model_index = item;
+            break;
+        }
     }
-    
+    if( dynamic_model_index == -1 )
+        callback( "Failed to parse and load dynamic model: No dynamic model found." );
 
-    self.cutter.ParseFile(model_data[0]);
-    //console.log( new Float32Array(self.cutter.GetJS_Vertex().buffer) )
+    self.cutter.ParseFile(model_data[dynamic_model_index], self.incisionWidth);
     
     var dyn_texture;
     var dyn_normals;
@@ -115,16 +146,36 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
         break;
     }
          
-    var static_models = [];
-    for( model_d in model_data ){
-        if(model_d == 0)
-            continue // Skip! We've just done the dynamic stuff...
-        var sm = self.cutter.ParseStaticFile( model_data[model_d] );
-        console.log( "Loaded Static model." )
-        sm.texture = scene["fixedObjects"][model_list[model_d]].textureMap;
-        sm.normal = scene["fixedObjects"][model_list[model_d]].normalMap;
-        static_models.push( sm );
+    self.static_models.length = 0;
+    self.fixed_geometry_models.length = 0;
+    self.collision_models.length = 0;
+    for( item in model_list ){
+        if( model_list[item].type == 'static' ){
+            var sm = self.cutter.ParseStaticFile( model_data[item] );
+            console.log( "Loaded Static model." )
+            sm.texture = scene["fixedObjects"][model_list[item].name].textureMap;
+            sm.normal = scene["fixedObjects"][model_list[item].name].normalMap;
+            self.static_models.push( sm );
+        }
+        if( model_list[item].type == 'fixed' ){
+            var fm = self.cutter.ParseStaticFile( model_data[item] );
+            console.log( "Loaded Fixing model." )
+            self.fixed_geometry_models.push( fm );
+        }
+        if( model_list[item].type == 'collision' ){
+            var cm = self.cutter.ParseStaticFile( model_data[item] );
+            console.log( "Loaded Collision model." )
+            self.collision_models.push( cm );
+        }
     }   
+
+    self.fixed_regions.length = 0;
+    if( 'fixedGeometry' in scene )
+        if( 'regions' in scene.fixedGeometry ) {
+            for( region in scene.fixedGeometry.regions ){
+                self.fixed_regions.push( [ scene.fixedGeometry.regions[region][0], scene.fixedGeometry.regions[region][1] ]  );
+            }
+        }
     
     // Update Dynamic Model
     
@@ -136,7 +187,7 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
     self.server.SetNormalName(dyn_normals)
 
     // Update Static Models
-    static_models.forEach( function(elem, index){
+    self.static_models.forEach( function(elem, index){
         self.server.AddStaticObject( Array.prototype.slice.call(new Uint32Array(elem.topology.buffer)),
                                      Array.prototype.slice.call(new Float32Array(elem.vertices.buffer)),
                                      Array.prototype.slice.call(new Float32Array(elem.uv.buffer)),
@@ -235,7 +286,8 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     self.cle.Set_Suture_Stiffness(self.sutureStiffness);
     self.cle.Set_Poissons_Ratio(self.poissons_ratio);
     self.cle.Set_Youngs_Modulus(self.youngs_modulus);
-    self.cle.Create_Model(vertices,topology,self.dx,self.refinement);    
+    var refinement = Math.ceil( self.dx / (self.incisionWidth / self.refinementRatio) );
+    self.cle.Create_Model(vertices,topology,self.dx,refinement);    
 
     // std::list<staticTriangle*>::iterator tit;
     // for(tit=_triList.begin(); tit!=_triList.end(); ++tit)	{
@@ -245,22 +297,24 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     //     self.cle.Add_Static_Model(sverts,stris);
     // }
 
-    // // INDEPENDENT fixed geometry input with scene load. Not necessarily related to an existing
-    // // vertex, line or triangle in the scene. Already computed, just output it.
-    // self.cle.Set_Fixed_Geometry(_fixedVerts,_fixedPoints,_fixedSegments,_fixedTriangles);
+    // Enable fixed geometry
+    //self.cle.Set_Fixed_Geometry(_fixedVerts,_fixedPoints,_fixedSegments,_fixedTriangles);
 
-    // for( int i = 0; i < _fixedRegions.size(); i++ ){
-    //     self.cle.Set_Fixed_Volume( _fixedRegions[i].first, _fixedRegions[i].second );
-    // }
+    for( item in self.fixed_regions ){
+        var region = self.fixed_regions[item];
+        self.cle.Set_Fixed_Volume( region[0], region[1] );
+    }
 
-    // if( _fixedmeshVerts.size() > 0 ){
-    //     self.cle.Set_Fixed_Triangles(_fixedmeshVerts,_fixedmeshTriangles);  
-    // }
+    for( item in self.fixed_geometry_models ){
+        var fm = self.fixed_geometry_models[item];
+        self.cle.Set_Fixed_Triangles(fm.vertices, fm.topology);  
+    }
 
-    // // This is for collisions
-    // if(!_collisionTris.empty()){
-    //     self.cle.Set_Collision_Model(_collisionVerts,_collisionTris);
-    // }
+    for( item in self.collision_models ){
+        var cm = self.collision_models[item];
+        self.cle.Set_Collision_Model(cm.vertices, cm.topology);   
+        break; // Only ever have one collision model.
+    }
     
     // for( int i = 0; i<_muscleVerts.size(); i++)
     // {

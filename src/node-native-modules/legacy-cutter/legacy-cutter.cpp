@@ -141,11 +141,12 @@ void Legacy_Cutter::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 void Legacy_Cutter::__ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& info ){
     Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
     std::string tempString(*v8::String::Utf8Value(info[0]));
+    float incisionWidth = info[1]->IsUndefined() ? 0.0036 : info[1]->NumberValue();
     trianglesUVW *_tuvw = obj->_sg->getTrianglesUVW();
     if(_tuvw->readObjFile(tempString.c_str()))
         Nan::ThrowError("Unable to load fixed uvwTriangle .obj input file-");
     obj->_sg->setNewTopology();
-    obj->_incis->setIncisionWidth(0.0036);
+    obj->_incis->setIncisionWidth(incisionWidth);
     obj->_incis->setPreferredEdgeLength(obj->_sg->getMeanEdgeTriangleLength());    
 }
 
