@@ -283,7 +283,8 @@ SBSS_Simulation.prototype.Update = function() {
 
         if( self.frame != data.frame ){
             console.log( "New frame data ready. Updating." );
-            self.server.UpdateVertices(Array.prototype.slice.call(new Float32Array(data.vdata.buffer)));
+            var splitVertexData = self.cutter.RemapVertexData(data.vdata);
+            self.server.UpdateVertices(Array.prototype.slice.call(new Float32Array(splitVertexData.buffer)));
             self.server.UpdateData();
             self.frame = data.frame;
         }

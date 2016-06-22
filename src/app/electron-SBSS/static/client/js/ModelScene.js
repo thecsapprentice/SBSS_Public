@@ -145,7 +145,7 @@ ModelScene.prototype.clearScene = function() {
 }
 
 
-ModelScene.prototype.processData = function(data) {
+ModelScene.prototype.processData = function(data, callback) {
     this.last_update = data.timestamp;
 
     //console.log("ModelScene: Processing Timestamp: " + data.timestamp );
@@ -163,14 +163,17 @@ ModelScene.prototype.processData = function(data) {
             if( "static" in data && !(data.static === undefined))
                 data.static.forEach(this.AddStaticObject.bind(this))   
 
+            callback( true );
         }.bind(this));        
     }
     else{
         if( "dynamic" in data && !(data.dynamic === undefined))
             this.ProcessObject( true, data.dynamic );
         
-            if( "static" in data && !(data.static === undefined))
-                data.static.forEach(this.AddStaticObject.bind(this))           
+        if( "static" in data && !(data.static === undefined))
+            data.static.forEach(this.AddStaticObject.bind(this))           
+        
+        callback(true);
     }
 
 
@@ -187,13 +190,16 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
     var needGeoCleanup = false;
     var signal_topology = false;
     var signal_vertices = false;
+    var deformation_update = false;
     if(isDynamic) {
-        if("uvs" in data) {
+        if( "vertices" in data && !(
+            "uvs" in data && "topology" in data ) ){
+            deformation_update = true;
+            geoNow = this.dynamic_geometry;
+        }
+        if( "uvs" in data && "topology" in data ){
             needGeoCleanup = true;
             geoNow = new THREE.BufferGeometry();        
-        }
-        else { // assume is a vertex position update
-            geoNow = this.dynamic_geometry;
         }
     }
     else
@@ -206,7 +212,7 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
         geoNow.setIndex( new THREE.BufferAttribute( indices, 1 ) );
         geoNow.elementsNeedUpdate = true;
     }
-    else{
+    else if(!deformation_update) {
         var indices = new Uint32Array( 0 );
         geoNow.setIndex( new THREE.BufferAttribute( indices, 1 ) );
         geoNow.elementsNeedUpdate = true;      
@@ -218,7 +224,7 @@ ModelScene.prototype.ProcessObject = function( isDynamic, data ){
         geoNow.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
         geoNow.elementsNeedUpdate = true;
     }
-    else{
+    else  if(!deformation_update) {
         var uvs = new Float32Array( 0 );
         geoNow.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
         geoNow.elementsNeedUpdate = true;

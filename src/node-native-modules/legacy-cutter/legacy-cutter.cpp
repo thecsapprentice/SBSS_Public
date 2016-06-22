@@ -115,6 +115,7 @@ void Legacy_Cutter::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "GetJS_UV", __GetJavascriptUV);
   Nan::SetPrototypeMethod(tpl,  "GetRaw_Vertex",__GetRawVertex);
   Nan::SetPrototypeMethod(tpl,  "GetRaw_Topology",__GetRawTopology);
+  Nan::SetPrototypeMethod(tpl,  "RemapVertexData",__RemapVertexData);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("Legacy_Cutter").ToLocalChecked(), tpl->GetFunction());
@@ -278,6 +279,22 @@ void Legacy_Cutter::__GetRawTopology( const Nan::FunctionCallbackInfo<v8::Value>
                                               tris->size()*sizeof(int)).ToLocalChecked());
 }
 
+void Legacy_Cutter::__RemapVertexData( const Nan::FunctionCallbackInfo<v8::Value>& info ){
+    Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
+    std::vector<float> vertex_data_in = load_std_vector<float>(info,0);
+    std::vector<float> vertex_data_out;
+    obj->_sg->remapJavascriptVertexData(vertex_data_in,vertex_data_out);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(vertex_data_out.data()),
+                                              vertex_data_out.size()*sizeof(float)).ToLocalChecked());
+}
+
+/********************************************************
+/
+/
+/       Non Wrapper functions are below here
+/
+/
+*///******************************************************
 
 bool Legacy_Cutter::texturePickCode(const int triangle, const float (&uv)[2], float (&uvw)[3], float &triangleDuv){
     // This is required by Court's old incision glue code. We may not need this as we refactor his stuff away.   

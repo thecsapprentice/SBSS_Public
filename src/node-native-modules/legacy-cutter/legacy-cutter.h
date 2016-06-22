@@ -43,6 +43,8 @@ class Legacy_Cutter : public Nan::ObjectWrap {
   static void __GetRawVertex( const Nan::FunctionCallbackInfo<v8::Value>& info );
   static void __GetRawTopology( const Nan::FunctionCallbackInfo<v8::Value>& info );
 
+  static void __RemapVertexData( const Nan::FunctionCallbackInfo<v8::Value>& info );
+
 
   
   // Members

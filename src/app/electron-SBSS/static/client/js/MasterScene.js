@@ -4,6 +4,9 @@
 //
 //
 
+var async = window.nodeRequire('async');
+
+
 var MasterScene = function() {
     this.container = null;
     this.comm = null;
@@ -63,6 +66,9 @@ MasterScene.prototype.initialize = function() {
     this.modelscene = new ModelScene(this);
     this.modelscene.initialize();
    
+    // DATA QUEUE
+    this.updateQueue = []
+    this.processingUpdate = false;
 
     // SIGNALS
     this.debug_mode_toggled = new signals.Signal();
@@ -107,21 +113,7 @@ MasterScene.prototype.CommOpened = function() {
 MasterScene.prototype.CommMessage = function(data) {
     //console.log("MasterScene: Message Received.");
     //console.log( data );
-    var toolData = {}
-    var modelData = {}
-
-    toolData.hooks = data.hooks;
-    toolData.sutures = data.sutures;
-    toolData.simulator_state = data.simulator_state;
-    toolData.timestamp = data.timestamp;
-    
-    modelData.dynamic = data.dynamic;
-    modelData.static = data.static;
-    modelData.textures = data.textures;
-    modelData.timestamp = data.timestamp;
-
-    this.processModels( modelData ); // Process model data first, as tools depend on it.
-    this.processTools( toolData );
+    this.updateQueue.push( data );
 }
 
 MasterScene.prototype.CommClosed = function() {
@@ -134,6 +126,61 @@ MasterScene.prototype.CommFailed = function() {
 }
 
 
+MasterScene.prototype.ProcessUpdate = function() {
+
+    var self = this;
+
+    if( !this.processingUpdate && this.updateQueue.length > 0){
+        this.processingUpdate = true;
+        var data = this.updateQueue.shift()
+        
+        var toolData = {}
+        var modelData = {}
+        
+        toolData.hooks = data.hooks;
+        toolData.sutures = data.sutures;
+        toolData.simulator_state = data.simulator_state;
+        toolData.timestamp = data.timestamp;
+        
+        modelData.dynamic = data.dynamic;
+        modelData.static = data.static;
+        modelData.textures = data.textures;
+        modelData.timestamp = data.timestamp;
+        
+        function updateComplete(err, results){
+            if(err){
+                console.log( "Error happened during update:" )
+                console.log( err );
+            }
+            else{
+                console.log( "Update applied successfully for timestamp: ", data.timestamp )
+            }
+            self.processingUpdate = false;
+        }
+            
+
+        // Fire the updates in a sequence
+        async.series( [ 
+            function(callback){
+                self.modelscene.processData( modelData, function(status){
+                    if(status)
+                        callback(null, true );
+                    else
+                        callback("Error with Model Update.", null );
+                })},
+            function(callback){
+                self.toolscene.processData( toolData, function(status){
+                    if(status)
+                        callback(null, true );
+                    else
+                        callback("Error with Model Update.", null );
+                })}
+        ], updateComplete.bind(this) );
+
+    }
+
+}
+
 MasterScene.prototype.render = function(timestamp) {
     if(this.start_render_timestamp === null) this.start_render_timestamp = timestamp;
     if(this.last_render_timestamp === null) this.last_render_timestamp = timestamp;
@@ -141,6 +188,7 @@ MasterScene.prototype.render = function(timestamp) {
     requestAnimationFrame(this.render.bind(this));
     this.update(timestamp);
     this.renderer.render(this.scene, this.camera);
+    this.ProcessUpdate();
 
     this.last_render_timestamp = timestamp;
 }
@@ -152,14 +200,4 @@ MasterScene.prototype.update = function(timestamp){
     //    $("#connection_status").html("SIMULATOR OFFLINE");
     //    connectionNextTime -= timestamp - last_render_timestamp;
     //}
-}
-
-MasterScene.prototype.processTools = function(data){
-    this.toolscene.processData( data );
-
-}
-
-MasterScene.prototype.processModels = function(data){
-    this.modelscene.processData( data );
-
 }

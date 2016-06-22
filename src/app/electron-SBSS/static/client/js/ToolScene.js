@@ -76,7 +76,7 @@ ToolScene.prototype.initialize = function(){
     this.hook_mesh = new THREE.Mesh( this.hook_geometry, this.hook_material );
 
     // Build Suture Mesh
-    var suture_sphere = new THREE.IcosahedronGeometry(1.0, 1);
+    var suture_sphere = new THREE.IcosahedronGeometry( .4, 1);
     modifier.modify(suture_sphere);
     var suture_cylinder = new THREE.CylinderGeometry(1.0, 1.0, 1.0);
     this.suture_material = new THREE.MeshLambertMaterial( { color: 0xffffee, opacity: 0.8 } );
@@ -147,7 +147,7 @@ ToolScene.prototype.clearScene = function() {
     this.clearMode();
 }
 
-ToolScene.prototype.processData = function(data) {
+ToolScene.prototype.processData = function(data, callback) {
     this.last_update = data.timestamp;
 
     //console.log("ToolScene: Processing Timestamp: " + data.timestamp );
@@ -161,9 +161,7 @@ ToolScene.prototype.processData = function(data) {
             if( mode.primary == -1 )
                 this.clearMode();
         }
-    }
-
-    
+    }   
 
     if( "hooks" in data && !(data.hooks === undefined)){
         this.clearManipulatorSelection();
@@ -174,6 +172,8 @@ ToolScene.prototype.processData = function(data) {
         this.clearManipulatorSelection();
         this.ProcessSutures( data.sutures );
     }
+
+    callback( true );
 }
 
 ToolScene.prototype.ProcessHooks = function( data ){
