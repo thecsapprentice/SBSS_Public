@@ -89,7 +89,14 @@ class CLEjs : public Nan::ObjectWrap, public CLElib {
      static void __WriteDebug(const Nan::FunctionCallbackInfo<v8::Value>& info);
      static void __Apply_Perturbation(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-     
+     // Accessors
+
+     static void __Getter_V_DATA_POSITION(v8::Local<v8::String> property,
+                                          const Nan::PropertyCallbackInfo<v8::Value>& info);
+     static void __Getter_V_DATA_STRESS(v8::Local<v8::String> property,
+                                          const Nan::PropertyCallbackInfo<v8::Value>& info);
+     static void __Getter_V_DATA_STRAIN(v8::Local<v8::String> property,
+                                          const Nan::PropertyCallbackInfo<v8::Value>& info);     
 };
 
 #endif

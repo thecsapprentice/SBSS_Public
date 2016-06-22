@@ -269,6 +269,7 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
 
     self.cle.Finalize_Initialization();
     self.physicsActive=true;
+    self.frame = 0;
     
 }
 
@@ -276,10 +277,19 @@ SBSS_Simulation.prototype.Update = function() {
     var self = this;
     
     if( self.physicsActive ){
-        //self.cle.Advance_One_Time_Step();
+        self.cle.Advance_One_Time_Step();
 
+        var data = self.cle.Get_Vertex_Data(self.cle.V_DATA_POSITION, self.frame );
 
+        if( self.frame != data.frame ){
+            console.log( "New frame data ready. Updating." );
+            self.server.UpdateVertices(Array.prototype.slice.call(new Float32Array(data.vdata.buffer)));
+            self.server.UpdateData();
+            self.frame = data.frame;
+        }
     }
+
+
 
 }
 

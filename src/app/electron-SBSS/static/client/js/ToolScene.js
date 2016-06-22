@@ -100,9 +100,9 @@ ToolScene.prototype.initialize = function(){
     // Move plane
     this.plane = new THREE.Mesh(
 	new THREE.PlaneBufferGeometry( 2000, 2000, 8, 8 ),
-	new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true } )
+	new THREE.MeshBasicMaterial( { wireframe:true, color: 0xFFFFFF, opacity: 0.25, transparent: false, side:THREE.DoubleSide } )
     );
-    this.plane.visible = false;
+    this.plane.material.visible = false;
     this.masterscene.scene.add( this.plane );
     this.offset = new THREE.Vector3(0,0,0);
 
@@ -501,7 +501,7 @@ ToolScene.prototype.handleMouseDown = function( event ) {
 }
 
 ToolScene.prototype.clearManipulatorSelection = function(){
-    this.plane.visible = false;
+    this.plane.material.visible = false;
     if( this.selected_hook_index != null ){
         this.selected_hook.material = this.hook_material;
         this.selected_hook_index = null;       
@@ -543,7 +543,7 @@ ToolScene.prototype.findManipulatorSelection = function(){
         var suture_index = this.sutures.indexOf( intersection.object.parent );
         if( hook_index > -1 ){
             if( this.debug )
-                this.plane.visible = true;
+                this.plane.material.visible = true;
             if( this.selected_hook != null )
                 this.selected_hook.material = this.hook_material;
             this.hooks[hook_index].material = this.hook_selected_material;
@@ -1070,7 +1070,7 @@ ToolScene.prototype.toggleDebugMode = function( debugFlag ) {
 
     if( !this.debug ){
         if( this.plane )
-            this.plane.visible = false;
+            this.plane.material.visible = false;
     }
 
 }

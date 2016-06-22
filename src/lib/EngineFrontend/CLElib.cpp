@@ -2953,7 +2953,7 @@ UpdateDirichletCells(const std::vector<std::vector<int> >& cells)
 // Function Get_Vertices
 //#####################################################################
 void CLElib::
-Get_Vertices(std::vector<double>& vertices_output) const
+Get_Vertices(std::vector<float>& vertices_output) const
 {
 #ifndef ENABLE_LOG_MESSAGES
     // LOG::SCOPE scope("CLElib::Get_Vertices()");
@@ -2993,7 +2993,7 @@ Get_Vertices(std::vector<double>& vertices_output) const
 // Function Get_Stress
 //#####################################################################
 void CLElib::
-Get_Stress(std::vector<double>& stress_output) const
+Get_Stress(std::vector<float>& stress_output) const
 {
 #ifndef ENABLE_LOG_MESSAGES
     // LOG::SCOPE scope("CLElib::Get_Vertices()");
@@ -3035,7 +3035,7 @@ Get_Stress(std::vector<double>& stress_output) const
 // Function Get_Strain
 //#####################################################################
 void CLElib::
-Get_Strain(std::vector<double>& strain_output) const
+Get_Strain(std::vector<float>& strain_output) const
 {
 #ifndef ENABLE_LOG_MESSAGES
     // LOG::SCOPE scope("CLElib::Get_Vertices()");
@@ -3077,7 +3077,7 @@ Get_Strain(std::vector<double>& strain_output) const
 // Function Get_Vertices
 //#####################################################################
 void CLElib::
-Get_Vertices(std::vector<double>& vertices_output, int& sinceFrame) const
+Get_Vertices(std::vector<float>& vertices_output, int& sinceFrame) const
 {
 #ifndef ENABLE_LOG_MESSAGES
     // LOG::SCOPE scope("CLElib::Get_Vertices()");
@@ -3106,7 +3106,7 @@ Get_Vertices(std::vector<double>& vertices_output, int& sinceFrame) const
 // Function Get_Vertex_Data
 //#####################################################################
 void CLElib::
-Get_Vertex_Data(std::vector<double>& vdata, int type, int& sinceFrame) const
+Get_Vertex_Data(std::vector<float>& vdata, int type, int& sinceFrame) const
 {
 #ifndef ENABLE_LOG_MESSAGES
     // LOG::SCOPE scope("CLElib::Get_Vertices()");

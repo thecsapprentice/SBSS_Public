@@ -141,6 +141,10 @@ void CLEjs::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "WriteDebug",  __WriteDebug);
   Nan::SetPrototypeMethod(tpl,  "Apply_Perturbation",  __Apply_Perturbation);
 
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("V_DATA_POSITION").ToLocalChecked(), __Getter_V_DATA_POSITION);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("V_DATA_STRESS").ToLocalChecked(), __Getter_V_DATA_STRESS);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New("V_DATA_STRAIN").ToLocalChecked(), __Getter_V_DATA_STRAIN);
+
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New("CLEjs").ToLocalChecked(), tpl->GetFunction());
 }
@@ -517,15 +521,44 @@ void CLEjs::__Get_Stress(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 };
 
 void CLEjs::__Get_Vertex_Data(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    Nan:: HandleScope scope;
+    v8::Local<v8::Object> results = Nan::New<v8::Object>();
+    
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
     typedef float T;
     std::vector<T> v_data;
     int type_in = info[0]->NumberValue();
     int since_frame_in = info[1]->NumberValue();
     obj->Get_Vertex_Data( v_data, type_in, since_frame_in );
-    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(v_data.data()),
-                                              v_data.size()*sizeof(T)).ToLocalChecked());        
+
+    results->Set( Nan::New("frame").ToLocalChecked(),
+                  Nan::New(since_frame_in) );
+
+    results->Set( Nan::New("vdata").ToLocalChecked(),
+                  Nan::CopyBuffer(reinterpret_cast<const char*>(v_data.data()),
+                                  v_data.size()*sizeof(T)).ToLocalChecked() );
+
+    
+    info.GetReturnValue().Set(results);
 };
+
+void CLEjs::
+__Getter_V_DATA_POSITION(v8::Local<v8::String> property,
+                         const Nan::PropertyCallbackInfo<v8::Value>& info){
+    info.GetReturnValue().Set( V_DATA_TYPE::POSITION );
+}
+
+void CLEjs::
+__Getter_V_DATA_STRESS(v8::Local<v8::String> property,
+                       const Nan::PropertyCallbackInfo<v8::Value>& info){
+    info.GetReturnValue().Set( V_DATA_TYPE::STRESS );
+}
+
+void CLEjs::
+__Getter_V_DATA_STRAIN(v8::Local<v8::String> property,
+                       const Nan::PropertyCallbackInfo<v8::Value>& info){
+    info.GetReturnValue().Set( V_DATA_TYPE::STRAIN );
+}
 
 void CLEjs::__Update_Embedded_Surfaces(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
@@ -553,3 +586,5 @@ void CLEjs::__Apply_Perturbation(const Nan::FunctionCallbackInfo<v8::Value>& inf
     float perturb_in = info[0]->NumberValue();
     obj->Apply_Perturbation( perturb_in );
 };
+
+
