@@ -46,14 +46,9 @@ MasterScene.prototype.initialize = function() {
     this.toolscene.initialize();
 
     // CONTROLS
-    this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
-    this.controls.rotateSpeed = 5.0;
-    this.controls.zoomSpeed = 1.2;
-    this.controls.panSpeed = 0.8;
-    this.controls.noZoom = false;
-    this.controls.noPan = false;
-    this.controls.staticMoving = true;
-    this.controls.dynamicDampingFactor = 0.3;
+    this.controls_active = true;
+    this.FreeControls();
+    
 
     // LIGHTS
     this.ambientLight = new THREE.AmbientLight( 0x474747 );
@@ -106,8 +101,8 @@ MasterScene.prototype.CommOpened = function() {
     $("#connection_status").html("SIMULATOR ONLINE");
     this.modelscene.clearScene();
     this.toolscene.clearScene();
-    if(this.controls)
-        this.controls.reset();
+    this.controls_active = true;
+    this.FreeControls();
 }
 
 MasterScene.prototype.CommMessage = function(data) {
@@ -194,10 +189,61 @@ MasterScene.prototype.render = function(timestamp) {
 }
 
 MasterScene.prototype.update = function(timestamp){
-    this.controls.update();
+    this.updateControls();
     //this.stats.update();
     //if( !connected ){
     //    $("#connection_status").html("SIMULATOR OFFLINE");
     //    connectionNextTime -= timestamp - last_render_timestamp;
     //}
+}
+
+MasterScene.prototype.updateControls = function(timestamp){
+    if( this.controls_active ){
+        this.controls.update();
+    }
+}
+
+MasterScene.prototype.FreeControls = function( enable_mouse_move_events ){
+    if( this.active_controls != "trackball" ){
+        var prevCamera = this.camera;
+        
+        this.camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.001, 100);
+        this.camera.position.copy( prevCamera.position );
+        this.camera.rotation.copy( prevCamera.rotation );
+
+        this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
+        this.controls.rotateSpeed = 5.0;
+        this.controls.zoomSpeed = 1.2;
+        this.controls.panSpeed = 0.8;
+        this.controls.noZoom = false;
+        this.controls.noPan = false;
+        this.controls.staticMoving = true;
+        this.controls.dynamicDampingFactor = 0.3;
+        
+        this.active_controls = "trackball";   
+        this.controls.update();
+    }
+}
+
+MasterScene.prototype.LockControls = function( lock_point, enable_mouse_move_events ){
+    if( this.active_controls != "orbit" ){
+        var prevCamera = this.camera;
+        
+        this.camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.001, 100);
+        this.camera.position.copy( prevCamera.position );
+        this.camera.rotation.copy( prevCamera.rotation );
+
+        this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+        this.controls.rotateSpeed = 5.0;
+        this.controls.zoomSpeed = 1.2;
+        this.controls.panSpeed = 0.8;
+        this.controls.target = lock_point.clone();
+        
+        this.active_controls = "orbit";
+        this.controls.update();
+    }
+}
+
+MasterScene.prototype.SetControls = function(active){
+    this.controls_active = active;
 }

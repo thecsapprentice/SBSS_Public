@@ -262,13 +262,13 @@ ToolScene.prototype.incMode = function () {
 
 ToolScene.prototype.clearMode = function () {
     if(this.masterscene.controls)
-        this.masterscene.controls.enabled=true;
+        this.masterscene.SetControls(true);;
     this.tool_sub_mode = null;
     this.masterscene.toolsgui.clearToolstate();
 }
 
 ToolScene.prototype.lockMode = function () {
-    this.masterscene.controls.enabled=false;
+    this.masterscene.SetControls(false);;
     this.tool_sub_mode = null;
     this.masterscene.toolsgui.setToolstate(-1);
 }
@@ -347,7 +347,7 @@ ToolScene.prototype.handleMouseMove = function( event ) {
         if( mode.secondary != null && this.keyflags.shift){
             if( mode.secondary == 1 )
                 this.incMode();
-            this.masterscene.controls.enabled=false;           
+            this.masterscene.SetControls(false);;           
             intersection = this.getIntersection( this.mouse, [ this.plane ] );
             this.selected_hook.position.copy( intersection.position.sub(this.offset) );
             this.selected_hook_position.copy( this.selected_hook.position );
@@ -392,12 +392,12 @@ ToolScene.prototype.handleMouseUp = function( event ) {
     case 0: // This is the default (View, Manipulate, Select)
         if( mode.secondary > 1 ){
             this.clearMode();
-            this.masterscene.controls.enabled=true;
+            this.masterscene.SetControls(true);;
             this.moveHook( this.selected_hook_index, this.selected_hook_position );
         }
         if( mode.secondary == 1 ){
             this.clearMode();
-            this.masterscene.controls.enabled=true;
+            this.masterscene.SetControls(true);;
         }
         break;
     case 1: // This is the place new hook mode
@@ -405,7 +405,7 @@ ToolScene.prototype.handleMouseUp = function( event ) {
     case 2: // This is the place new suture mode
         if( mode.secondary != null ){
             this.addSuture();
-            this.masterscene.controls.enabled=true;
+            this.masterscene.SetControls(true);;
             this.clearMode();
             this.draw_suture_group.visible = false;
         }
@@ -438,9 +438,11 @@ ToolScene.prototype.handleMouseDown = function( event ) {
         this.findManipulatorSelection();
         if( this.selected_hook != null ){ // Prepare for potential drag operation
             this.incMode();            
+            this.masterscene.LockControls( this.selected_hook.position, true );
         }
         else{
             this.clearMode();
+            this.masterscene.FreeControls( true );
         }
 
         break;
@@ -453,11 +455,11 @@ ToolScene.prototype.handleMouseDown = function( event ) {
         if( event.button == 0 )
             if( this.StartSuture(!this.keyflags.ctrl) ){
                 this.incMode();
-                this.masterscene.controls.enabled=false;
+                this.masterscene.SetControls(false);;
             }
         if( event.button == 2 ){
             this.clearMode();
-            this.masterscene.controls.enabled=true;
+            this.masterscene.SetControls(true);;
             this.draw_suture_group.visible = false;
         }            
         break;
