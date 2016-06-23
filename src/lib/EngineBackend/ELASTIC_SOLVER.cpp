@@ -3,7 +3,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 
 #include <Common/ALIGNED_ARRAY.h>
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 #include "ELASTIC_SOLVER.h"
 

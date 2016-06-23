@@ -6,7 +6,7 @@
 //#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX.h>
 //#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 //#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_3D.h>
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Common/STENCIL_ITERATOR.h>
 
 #include <iostream>

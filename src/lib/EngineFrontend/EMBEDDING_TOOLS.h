@@ -16,7 +16,7 @@
 
 #include <EngineInterface/CELL_TYPE.h>
 
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Common/STENCIL.h>
 
 namespace PhysBAM {

@@ -125,12 +125,17 @@ class ELASTIC_LATTICE_DEFORMER:public EMBEDDED_DEFORMER_BASE
 
     struct SINGLE_POINT_CONSTRAINT{
         int triangle; // Optional - Set to -1 if not associated with a triangle
+        std::array<float,3> tri_uv; // Optional - Set to {-1,-1,-1} if not associated with a triangle
+
         int cid;      // Identifier into the fine constraint array
     };
 
     struct DUAL_POINT_CONSTRAINT{
         int triangleA; // Optional - Set to -1 if not associated with a triangle
         int triangleB; // Optional - Set to -1 if not associated with a triangle
+        std::array<float,3> triA_uv; // Optional - Set to {-1,-1,-1} if not associated with a triangle
+        std::array<float,3> triB_uv; // Optional - Set to {-1,-1,-1} if not associated with a triangle
+
         int cid;      // Identifier into the fine constraint array
     };
 

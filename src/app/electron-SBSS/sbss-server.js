@@ -54,17 +54,21 @@ function StateData(){
     this.staticobjects = []
     this.textures = {}
     this.hooks = []
+    this.sutures = []
     
     this.textures_timestamp = 0;
     this.hooks_timestamp = 0;
+    this.sutures_timestamp = 0;
 
     this.Reset = function(){
         this.dynamic = new Object();
         this.staticobjects = []
         this.hooks = []
+        this.sutures = []
         this.textures = {}    
         this.textures_timestamp = 0;
         this.hooks_timestamp = 0;
+        this.sutures_timestamp = 0;
     }
     
     this.maxTimestamp = function(){
@@ -74,6 +78,7 @@ function StateData(){
             max_timestamp = Math.max( this.staticobjects[obj].maxTimestamp(), max_timestamp );
         max_timestamp = Math.max( this.textures_timestamp, max_timestamp );
         max_timestamp = Math.max( this.hooks_timestamp, max_timestamp );
+        max_timestamp = Math.max( this.sutures_timestamp, max_timestamp );
         return max_timestamp;
     }
 
@@ -106,6 +111,15 @@ function StateData(){
                 json_data["hooks"][hook] = {'id': this.hooks[hook].id, 'triangle': this.hooks[hook].triangle, 'pos':this.hooks[hook].position };
         }
         
+        if( this.sutures_timestamp > since ){
+            json_data["sutures"] = []
+            for( suture in this.sutures )
+                json_data["sutures"][suture] = {'id': this.sutures[suture].id,
+                                                'triangleA': this.sutures[suture].triangleA, 'uvA':this.sutures[suture].uvA,
+                                                'triangleB': this.sutures[suture].triangleB, 'uvB':this.sutures[suture].uvB
+                                               };
+        }
+
         json_data.timestamp = this.maxTimestamp();
 
         return json_data;
@@ -235,7 +249,14 @@ SBSS_Server.prototype.UpdateHooks = function( hook_data ){
 }
 
 SBSS_Server.prototype.UpdateSutures = function( suture_data ){
-
+    var self = this;
+    self.state_data.sutures = []
+    for( suture in suture_data )
+        self.state_data.sutures.push( { 'id':suture_data[suture].suture,
+                                        'triangleA':suture_data[suture].triangleA, 'uvA':suture_data[suture].uvA,
+                                        'triangleB':suture_data[suture].triangleB, 'uvB':suture_data[suture].uvB
+                                      } )
+    self.state_data.sutures_timestamp = self.IncTimestamp();    
 }
 
 SBSS_Server.prototype.SetSimulatorState = function( state ){

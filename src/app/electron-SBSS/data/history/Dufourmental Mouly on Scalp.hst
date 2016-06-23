@@ -594,7 +594,7 @@
     {
         "command" : "deleteHook",
         "data" : {
-            "hook_id" : 0
+            "hook_id" : 1
         }
     },
     {
@@ -617,7 +617,7 @@
     {
         "command" : "deleteHook",
         "data" : {
-            "hook_id" : 0
+            "hook_id" : 2
         }
     },
     {

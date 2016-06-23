@@ -86,12 +86,21 @@ public:
     void Get_Single_Point_Constraint_Triangles(const std::vector<int>& ids, std::vector< int >& triangles);
     void Get_Active_Single_Point_Constraints(std::vector<int>& ids);
     
-    /* DEPRECATED */ int Add_Suture(const int triangle_id1,const float (&weights1)[2],const int triangle_id2,const float (&weights2)[2]);
+/*
+    int Add_Suture(const int triangle_id1,const float (&weights1)[2],const int triangle_id2,const float (&weights2)[2]);
     int Add_Suture(const int triangle_id1,const std::array<float,2> &weights1,
                    const int triangle_id2,const std::array<float,2> &weights2);
-    /* DEPRECATED */ int Add_Suture(const float(&location1)[3], const float(&location2)[3]);
+    int Add_Suture(const float(&location1)[3], const float(&location2)[3]);
     int Add_Suture(std::array<float,3>& location1, std::array<float,3>& location2);
     void Delete_Suture(const int suture_id);
+*/
+    int Add_Dual_Point_Constraint(const int triangleA_id, const std::array<float,3>& uv_A, 
+                                  const int triangleB_id, const std::array<float,3>& uv_B );
+    int Add_Dual_Point_Constraint(const std::array<float,3>& locationA, const std::array<float,3>& locationB );
+    void Delete_Dual_Point_Constraint( const int suture_id);
+    void Get_Dual_Point_Constraint_UV( const std::vector<int>& ids, std::vector<std::array<float,6> >& UVs);
+    void Get_Dual_Point_Constraint_Triangles( const std::vector<int>& ids, std::vector<std::array<int,2> >& triangles);
+    void Get_Active_Dual_Point_Constraints( std::vector<int>& ids );
 
     // May be called anytime, but after the call to Set_Fixed_Triangles
     void Advance_One_Time_Step();

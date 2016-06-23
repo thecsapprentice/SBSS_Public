@@ -5,7 +5,7 @@
 // Class NONLINEAR_ELASTICITY (2D specializations)
 //#####################################################################
 #include "NONLINEAR_ELASTICITY.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 #ifdef LOG_DETAILED_PERFORMANCE
 #define LOG_DETAILED_PERFORMANCE_NE

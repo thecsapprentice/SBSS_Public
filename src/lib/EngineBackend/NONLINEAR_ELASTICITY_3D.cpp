@@ -8,7 +8,7 @@
 
 #include "SKINNING_NONLINEAR_ELASTICITY.h"
 //#include "NONLINEAR_ELASTICITY.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "SPECIALIZED_KERNELS.h"
 
 #include <Thread_Queueing/PTHREAD_QUEUE.h>

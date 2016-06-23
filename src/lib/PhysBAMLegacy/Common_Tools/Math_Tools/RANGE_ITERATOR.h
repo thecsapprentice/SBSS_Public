@@ -17,11 +17,11 @@ class RANGE_ITERATOR<d,1>
     typedef VECTOR<int,d> TV_INT;
     typedef RANGE<TV_INT> T_RANGE;
 
-    const T_RANGE& range;
+    const T_RANGE range;
     TV_INT index;
 
 public:
-    RANGE_ITERATOR(const T_RANGE& range_input)
+    RANGE_ITERATOR(const T_RANGE range_input)
         :range(range_input)
     {
         Reset();
@@ -47,11 +47,11 @@ class RANGE_ITERATOR
     typedef VECTOR<int,d> TV_INT;
     typedef RANGE<TV_INT> T_RANGE;
 
-    const T_RANGE& range;
+    const T_RANGE range;
     TV_INT index;
 
 public:
-    RANGE_ITERATOR(const T_RANGE& range_input)
+    RANGE_ITERATOR(const T_RANGE range_input)
         :range(range_input)
     {
         Reset();

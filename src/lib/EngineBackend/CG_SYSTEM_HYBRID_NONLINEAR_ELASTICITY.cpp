@@ -10,7 +10,7 @@
 #include "CG_SYSTEM.h"
 #include "CG_VECTOR.h"
 #include "HYBRID_NONLINEAR_ELASTICITY.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 
 #include <CG_Optimized_Kernels/Dot_Product/Dot_Product_Helper.h>

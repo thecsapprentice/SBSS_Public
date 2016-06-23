@@ -128,6 +128,9 @@ void CLEjs::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl,  "Get_Active_Hooks",  __Get_Active_Hooks);
   Nan::SetPrototypeMethod(tpl,  "Add_Suture",  __Add_Suture);
   Nan::SetPrototypeMethod(tpl,  "Delete_Suture",  __Delete_Suture);
+  Nan::SetPrototypeMethod(tpl,  "Get_Suture_UV",  __Get_Suture_UV);
+  Nan::SetPrototypeMethod(tpl,  "Get_Suture_Triangles",  __Get_Suture_Triangles);
+  Nan::SetPrototypeMethod(tpl,  "Get_Active_Sutures",  __Get_Active_Sutures);
   Nan::SetPrototypeMethod(tpl,  "Advance_One_Time_Step",  __Advance_One_Time_Step);
   Nan::SetPrototypeMethod(tpl,  "WaitForSolve",  __WaitForSolve);
   Nan::SetPrototypeMethod(tpl,  "Update_Fine_Displacement",  __Update_Fine_Displacement);
@@ -449,15 +452,15 @@ void CLEjs::__Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
     if( info.Length() == 4 ){
         int triangle1_id_in = info[0]->NumberValue();
-        std::array<T,2> weights1 = load_std_array<T,2>(info,1);      
+        std::array<T,3> weights1 = load_std_array<T,3>(info,1);      
         int triangle2_id_in = info[2]->NumberValue();
-        std::array<T,2> weights2 = load_std_array<T,2>(info,3);      
-        ret = obj->Add_Suture( triangle1_id_in, weights1, triangle2_id_in, weights2 );       
+        std::array<T,3> weights2 = load_std_array<T,3>(info,3);      
+        ret = obj->Add_Dual_Point_Constraint( triangle1_id_in, weights1, triangle2_id_in, weights2 );       
     }
     if( info.Length() == 2 ){
         std::array<T,3> location1 = load_std_array<T,3>(info,0);
         std::array<T,3> location2 = load_std_array<T,3>(info,1);      
-        ret = obj->Add_Suture( location1, location2 );
+        ret = obj->Add_Dual_Point_Constraint( location1, location2 );
     }
     
     info.GetReturnValue().Set(ret);
@@ -466,8 +469,34 @@ void CLEjs::__Add_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 void CLEjs::__Delete_Suture(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
     int suture_id_in = info[0]->NumberValue();
-    obj->Delete_Suture( suture_id_in );
+    obj->Delete_Dual_Point_Constraint( suture_id_in );
 };
+
+void CLEjs::__Get_Suture_UV(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> suture_ids = load_std_vector<int>(info,0);
+    std::vector<std::array<float,6> > uvs;
+    obj->Get_Dual_Point_Constraint_UV( suture_ids, uvs );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(uvs.data()),
+                                              6*uvs.size()*sizeof(float)).ToLocalChecked());
+};
+
+void CLEjs::__Get_Suture_Triangles(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> suture_ids = load_std_vector<int>(info,0);
+    std::vector< std::array<int,2> > triangles;
+    obj->Get_Dual_Point_Constraint_Triangles( suture_ids, triangles );
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(triangles.data()),
+                                              triangles.size()*sizeof(int)).ToLocalChecked());
+};
+
+void CLEjs::__Get_Active_Sutures(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());
+    std::vector<int> suture_ids;
+    obj->Get_Active_Dual_Point_Constraints(suture_ids);
+    info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(suture_ids.data()),
+                                              suture_ids.size()*sizeof(int)).ToLocalChecked());
+}
 
 void CLEjs::__Advance_One_Time_Step(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     CLEjs* obj = ObjectWrap::Unwrap<CLEjs>(info.Holder());

@@ -8,7 +8,7 @@
 #include "CG_POLICY.h"
 #include "NONLINEAR_ELASTICITY.h"
 
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 using namespace PhysBAM;
 
 #ifdef LOG_DETAILED_PERFORMANCE

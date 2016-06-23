@@ -8,7 +8,7 @@
 #include "CG_VECTOR.h"
 #include "SKINNING_NONLINEAR_ELASTICITY.h"
 #include "NONLINEAR_ELASTICITY.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 #include <CG_Optimized_Kernels/Dot_Product/Dot_Product_Helper.h>
 #include <CG_Optimized_Kernels/Convergence_Norm/Convergence_Norm_Helper.h>

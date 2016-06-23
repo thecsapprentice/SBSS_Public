@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 
 #include "HYBRID_NONLINEAR_ELASTICITY.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 struct NEOHOOKEAN_TAG;
 struct COROTATED_TAG;

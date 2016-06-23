@@ -8,7 +8,7 @@
 #include "NONLINEAR_ELASTICITY.h"
 #include "CG_SYSTEM.h"
 #include "CG_VECTOR.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "ROTATED_STRESS_DERIVATIVE.h"
 
 //For the Haxks

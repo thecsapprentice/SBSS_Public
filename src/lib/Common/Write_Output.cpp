@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 
-#include "RANGE_ITERATOR.h"
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include "Write_Output.h"
 
 namespace PhysBAM{

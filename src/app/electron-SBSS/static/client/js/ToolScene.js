@@ -552,7 +552,7 @@ ToolScene.prototype.findManipulatorSelection = function(){
             this.selected_hook_position = new THREE.Vector3().copy( this.selected_hook.position );
         }
         if( suture_index > -1 ){
-            this.selected_suture_index = suture_index;
+            this.selected_suture_index = this.hooks[suture_index].suture_id;
             if( this.selected_suture != null ){
                 this.selected_suture.children[0].material = this.suture_material;
                 this.selected_suture.children[1].material = this.suture_material;
@@ -1045,16 +1045,16 @@ ToolScene.prototype.updateSutures = function() {
             return result;
         }
         var ptA = getPosition(this.masterscene.modelscene.dynamic_geometry,
-                              item.A.triangle,item.A.uv);
+                              item.triangleA,item.uvA);
         var ptB = getPosition(this.masterscene.modelscene.dynamic_geometry,
-                              item.B.triangle,item.B.uv);
+                              item.triangleB,item.uvB);
         var sutMesh = getSutureMesh(this.suture_object, ptA, ptB, this.scaling_factor );
-     
+        sutMesh.suture_id = item.id;
         this.sutures.push( sutMesh );
     }.bind(this));
 
     this.sutures.forEach( function( item, index ){  // , index, array
-        if( index == this.selected_suture_index ){
+        if( item.suture_id == this.selected_suture_index ){
             this.selected_suture = item;
             this.selected_suture.children[0].material = this.suture_selected_material;
             this.selected_suture.children[1].material = this.suture_selected_material;

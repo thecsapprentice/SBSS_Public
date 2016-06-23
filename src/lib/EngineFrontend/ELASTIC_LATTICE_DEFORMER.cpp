@@ -15,7 +15,7 @@
 #endif
 
 #include "ELASTIC_LATTICE_DEFORMER.h"
-#include <Common/RANGE_ITERATOR.h>
+#include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 
 
 using namespace PhysBAM;

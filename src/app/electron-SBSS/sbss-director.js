@@ -95,7 +95,22 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
         if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
         self.DeleteHook( data );
         break;
-        
+     
+        /* 
+           
+           Suture Commands
+           
+        */
+    case 'addSuture':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.AddSuture(data);
+        break;
+
+    case 'deleteSuture':
+        if( historyAppend ) self.history.TruncateAppend( {'command':command, 'data':data} );
+        self.DeleteSuture( data );
+        break;
+   
     }
 }
 
@@ -152,6 +167,17 @@ SBSS_Director.prototype.MoveHook = function(data){
 SBSS_Director.prototype.DeleteHook = function(data){
     var self=this;
     self.simulation.DeleteHook( data.hook_id );
+}
+
+SBSS_Director.prototype.AddSuture = function(data){
+    var self =this;
+    self.simulation.AddSuture( data.triangleA, data.uvA, data.triangleB, data.uvB );
+}
+
+SBSS_Director.prototype.DeleteSuture = function(data){
+    var self= this;
+    self.simulation.DeleteSuture( data.suture_id );
+
 }
 
 // Exports

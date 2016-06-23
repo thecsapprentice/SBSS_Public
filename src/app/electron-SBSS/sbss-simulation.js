@@ -264,6 +264,46 @@ SBSS_Simulation.prototype.UpdateHooks = function() {
     self.server.UpdateData();
 }
 
+SBSS_Simulation.prototype.AddSuture = function( triangleA, suture_uv_A, triangleB, suture_uv_B ){
+    var self=this
+
+    if(!self.physicsActive)
+        self.ReinitializeAndStartPhysics()
+
+    self.cle.Add_Suture( triangleA, suture_uv_A, triangleB, suture_uv_B );
+    self.UpdateSutures();
+}
+
+SBSS_Simulation.prototype.DeleteSuture = function( suture_id ){
+    var self=this;
+
+    if(!self.physicsActive)
+        return;
+
+    self.cle.Delete_Suture( suture_id );
+    self.UpdateSutures();
+}
+
+SBSS_Simulation.prototype.UpdateSutures = function() {
+    var self=this;
+    var suture_ids = self.cle.Get_Active_Sutures();
+    var suture_uvs = new Float32Array( self.cle.Get_Suture_UV(suture_ids).buffer )
+    var suture_triangles = new Int32Array( self.cle.Get_Suture_Triangles(suture_ids).buffer )
+    suture_ids = new Uint32Array(suture_ids.buffer)
+   
+    sutures = [];   
+    for( var i=0; i < suture_ids.length; i++ ){
+        if( suture_triangles[i*2+0] != -1 && suture_triangles[i*2+1] != -1 )
+            sutures.push( {"suture": suture_ids[i],
+                           "triangleA": suture_triangles[i*2+0], "uvA": Array.prototype.slice.call( suture_uvs, i*6+0, i*6+3 ),
+                           "triangleB": suture_triangles[i*2+1], "uvB": Array.prototype.slice.call( suture_uvs, i*6+3, i*6+6 )
+                          });
+    }
+        
+    self.server.UpdateSutures( sutures );
+    self.server.UpdateData();
+}
+
 SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     var self=this;
 
@@ -282,6 +322,7 @@ SBSS_Simulation.prototype.ReinitializeAndStartPhysics = function() {
     topologyOut.write( Buffer.from( topology.buffer ) );
     topologyOut.end();
     
+
     self.cle.Set_Hook_Stiffness(self.hookStiffness);
     self.cle.Set_Suture_Stiffness(self.sutureStiffness);
     self.cle.Set_Poissons_Ratio(self.poissons_ratio);
