@@ -65,7 +65,7 @@ std::string Get_Working_Directory()
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 
 bool Directory_Exists(const std::string& dirname)
-{return std::ifstream(dirname.c_str())!=0;}
+{return (bool)(std::ifstream(dirname.c_str()));}
 
 bool Create_Directory(const std::string& dirname)
 {if(!Directory_Exists(dirname)){
@@ -175,18 +175,18 @@ int Compare_File_Times(const std::string& filename1,const std::string& filename2
 // Function File_Exists_Ignoring_Compression_Suffix
 //###################################################################
 bool File_Exists_Ignoring_Compression_Suffix(const std::string& filename)
-{return std::ifstream(filename.c_str())!=0;}
+{return (bool)(std::ifstream(filename.c_str()));}
 //###################################################################
 // Function File_Writable_Ignoring_Compression_Suffix
 //###################################################################
 bool File_Writable_Ignoring_Compression_Suffix(const std::string& filename)
-{return std::ofstream(filename.c_str(),std::ios::out)!=0;} // TODO: make this not create the file
+{return (bool)(std::ofstream(filename.c_str(),std::ios::out));} // TODO: make this not create the file
 //###################################################################
 // Function Directory_Writable
 //###################################################################
 bool Directory_Writable(const std::string& dirname) // TODO: make this nicer
 {static const char* dummy_filename="_PHYSBAM_FILE_UTILITIES_DUMMY_";
-std::string filename=dirname+"/"+dummy_filename;bool success=(std::ofstream(filename.c_str())!=0);remove(filename.c_str());return success;}
+  std::string filename=dirname+"/"+dummy_filename;bool success=((bool)(std::ofstream(filename.c_str())));remove(filename.c_str());return success;}
 //###################################################################
 // Function Find_First_Nonexistent_File_In_Sequence
 //###################################################################

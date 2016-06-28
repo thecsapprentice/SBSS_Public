@@ -32,7 +32,7 @@ namespace
 
     template<class T> static bool streamable_string_to_value(const std::string& value_string,T& value)
     {std::istringstream value_string_stream(value_string);
-    return value_string_stream>>value;}
+      return (bool)(value_string_stream>>value);}
 
     static bool is_dash_parameter_name(const std::string &str,std::string *parameter_name=0)
     {if(str.length()>1 && str[0]=='-'){
@@ -146,7 +146,7 @@ template<class T> struct PARAMETER_LIST_PARSER<RANGE<VECTOR<T,2> > >
     static bool String_To_Value(const std::string& value_string,RANGE<VECTOR<T,2> >& value,bool commandline_style)
     {
         std::istringstream value_string_stream(value_string);value_string_stream>>value.min_corner.x>>value.max_corner.x>>value.min_corner.y>>value.max_corner.y;
-        return value_string_stream!=0;
+        return (bool)(value_string_stream);
     }
 };
 DEFINE_PARSER_PARAMETER(RANGE<VECTOR<int,2> >);

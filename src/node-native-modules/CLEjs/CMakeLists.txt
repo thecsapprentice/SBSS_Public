@@ -18,7 +18,6 @@ add_dependencies(CLEjs native-modules-prebuild)
 # Essential library files to link to a node addon
 # You should add this line in every CMake.js based project
 target_link_libraries(CLEjs 
-  HTTPViewer
   GraphicsUtils
   Thread_Queueing
   EngineFrontend
@@ -32,12 +31,11 @@ target_link_libraries(CLEjs
   PhysBAM_Tools
   PhysBAM_Common_Geometry
   PhysBAM_Nonmanifold_Implicit_Objects
-  curl
   GL
   GLEW
   pthread
-  boost_system
-  boost_thread
+#  boost_system
+#  boost_thread
   )
 
 install( TARGETS CLEjs
