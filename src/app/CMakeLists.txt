@@ -1,4 +1,6 @@
 
+add_subdirectory( opengl_3d )
+
 add_custom_target(electron-prebuild ALL
  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
  DEPENDS
@@ -32,7 +34,6 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/electron-v${electron_versi
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/electron-v${electron_version}/electron-v${electron_version}.zip
   )
 
-#add_subdirectory( SBSS )
 
 install(DIRECTORY electron-SBSS/  DESTINATION share/sbss/app
   PATTERN "node_modules" EXCLUDE

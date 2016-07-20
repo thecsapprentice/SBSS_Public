@@ -32,6 +32,7 @@
 
 # Build directory
 build/*
+build_debug/*
 
 # install directory
 install/*

@@ -31,11 +31,10 @@ target_link_libraries(CLEjs
   PhysBAM_Tools
   PhysBAM_Common_Geometry
   PhysBAM_Nonmanifold_Implicit_Objects
+  tet
   GL
   GLEW
   pthread
-#  boost_system
-#  boost_thread
   )
 
 install( TARGETS CLEjs

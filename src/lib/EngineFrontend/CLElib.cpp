@@ -60,6 +60,11 @@
 #include <Common_Geometry/Nonmanifold_Topology_Generation/CUTTER_NONMANIFOLD_LEVELSET_STRATEGY.h>
 #include <Common_Geometry/Nonmanifold_Topology_Generation/CUTTER_BASIC_STRATEGY.h>
 #include <Common_Geometry/Nonmanifold_Topology_Generation/MATERIAL_PREDICATE_VOXELIZED_VOLUME.h>
+
+//TetGen
+#define TETLIBRARY
+#include <tetgen.h>
+
 using namespace PhysBAM;
 
 #define GRID_IN_GRID
@@ -123,6 +128,8 @@ CLElib()
 //    elastic_lattice_deformer.parameter_animation=0;
     //elastic_lattice_deformer.discretization=0;
     LOG::Initialize_Logging(false, false, LOG_DEPTH , false);
+
+    Initialize_Geometry_Particle();Initialize_Read_Write_Structures();
 
     refinement = 10;
 
@@ -267,6 +274,55 @@ Create_Model(const std::vector<float>& vertices_input,const std::vector<int>& tr
         triangle_mesh.Initialize_Node_On_Boundary();
         PHYSBAM_ASSERT(!triangle_mesh.node_on_boundary->Contains(true));
     }
+
+    // Build Tetrahedralized Object
+    // (w/ TetGen)
+    GEOMETRY_PARTICLES<TV> tet_particles;
+    TETRAHEDRALIZED_VOLUME<T>* tetvolume = TETRAHEDRALIZED_VOLUME<T>::Create(tet_particles);
+
+    {
+      LOG::SCOPE scope("Running TetGen");
+      tetgenio tetgen_input, tetgen_output;
+      tetgen_input.numberofpoints = (vertices_input.size() / 3);
+      tetgen_input.pointlist = new REAL[ vertices_input.size() ];
+      for( int i = 0; i<vertices_input.size(); i++ )
+	tetgen_input.pointlist[i] = vertices_input[i];
+      	
+      tetgen_input.numberoftrifaces = (triangles_input.size()/3);
+      tetgen_input.trifacelist = new int[ triangles_input.size() ];
+      memcpy( tetgen_input.trifacelist, triangles_input.data(), triangles_input.size()*sizeof(int) );
+
+      tetgenbehavior switches;
+      switches.plc = 0;
+      switches.docheck = 1;
+      switches.verbose = 1;
+      
+      tetrahedralize( &switches, &tetgen_input, &tetgen_output );
+
+      LOG::cout << tetgen_output.numberofpoints << "   " << vertices_input.size()/3 << std::endl;
+      
+      for( int v=0; v < tetgen_output.numberofpoints; v++ ){
+	int p = tet_particles.array_collection->Add_Element();
+	PHYSBAM_ASSERT( p == v+1 );
+	for( int w=0;w<d;w++)
+	  tet_particles.X(p)(w+1)=tetgen_output.pointlist[ v*3 + w ];
+      }
+      for( int t=0; t<tetgen_output.numberoftetrahedra; t++)
+	tetvolume->mesh.elements.Append( VECTOR<int,4>(tetgen_output.tetrahedronlist[t*4+0]+1,
+						       tetgen_output.tetrahedronlist[t*4+1]+1,
+						       tetgen_output.tetrahedronlist[t*4+2]+1,
+						       tetgen_output.tetrahedronlist[t*4+3]+1 ));
+      
+      tetvolume->Update_Number_Nodes();
+
+      {
+	FILE_UTILITIES::Create_Directory("tetrahedralized_object/0");
+	DEFORMABLE_GEOMETRY_COLLECTION<TV> collection(tet_particles);
+	collection.Add_Structure(tetvolume);
+	collection.Write(stream_type,"tetrahedralized_object",0,0,true);
+      }
+    }
+    
     
     // Build High Res Render Surface
     {
@@ -301,10 +357,6 @@ Create_Model(const std::vector<float>& vertices_input,const std::vector<int>& tr
         
         delete render_surface;
     }
-
-
-
-
 
 
     // Compute (padded) bounding box
