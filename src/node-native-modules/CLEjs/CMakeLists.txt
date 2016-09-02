@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 # Name of the project (will be the name of the plugin)
 #project(addon)
@@ -20,21 +20,7 @@ add_dependencies(CLEjs native-modules-prebuild)
 target_link_libraries(CLEjs 
   GraphicsUtils
   Thread_Queueing
-  EngineFrontend
-  EngineInterfaceLocal
-  EngineInterface
-  EngineBackend
-  Common
-  CG_Optimized_Kernels
-  SIMD_Optimized_Kernels
-  PhysBAM_Geometry
-  PhysBAM_Tools
-  PhysBAM_Common_Geometry
-  PhysBAM_Nonmanifold_Implicit_Objects
-  tet
-  GL
-  GLEW
-  pthread
+  EngineFrontend  
   )
 
 install( TARGETS CLEjs

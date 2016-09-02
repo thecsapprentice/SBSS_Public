@@ -1,5 +1,6 @@
-#ifndef __ENGINE_INTERFACE_LOCAL_H__
-#define __ENGINE_INTERFACE_LOCAL_H__
+#ifndef __ENGINE_INTERFACE_MPI_H__
+#define __ENGINE_INTERFACE_MPI_H__
+#ifdef ENABLE_MPI_OFFLOAD
 #include <EngineInterface/ENGINE_INTERFACE.h>
 #include <Common_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Common/STENCIL.h>
@@ -7,34 +8,13 @@
 
 namespace PhysBAM{
 
-    template <class T, int d, bool enable_constraints, bool enable_muscles> class SKINNING_NONLINEAR_ELASTICITY;
-    template <class ELASTICITY> class HYBRID_NONLINEAR_ELASTICITY;
-    template <class ELASTICITY> struct HYBRID_NONLINEAR_ELASTICITY_STATE;
-    template <class ARRAY, int d, int stride> struct HYBRID_BINDER;
-    template <class T, class ID, unsigned int align> class ALIGNED_ARRAY;
-    template <class BINDER, class STATE, class DISCRETIZATION> class ELASTIC_SOLVER;
-
-    class ENGINE_INTERFACE_LOCAL : public ENGINE_INTERFACE
+    class ENGINE_INTERFACE_MPI : public ENGINE_INTERFACE
     {
         using ENGINE_INTERFACE::T;
         using ENGINE_INTERFACE::d;
         using ENGINE_INTERFACE::TV;
         using ENGINE_INTERFACE::T_INDEX;
-        using ENGINE_INTERFACE::T_FLAG;
-        
-        typedef STENCIL<T,d> T_STENCIL;
-        typedef STENCIL_ITERATOR<T,d> T_STENCIL_ITERATOR;
-        typedef STENCIL_ITERATOR<const T,d> T_CONST_STENCIL_ITERATOR;
-
-        typedef HYBRID_NONLINEAR_ELASTICITY<SKINNING_NONLINEAR_ELASTICITY<T,d,true,true> > T_DISCRETIZATION;
-        typedef HYBRID_NONLINEAR_ELASTICITY_STATE<SKINNING_NONLINEAR_ELASTICITY<T,d,true,true> > T_STATE;
-        typedef HYBRID_BINDER<ALIGNED_ARRAY<T, int, 64>, d, 16> T_STATE_BINDER;
-        
-        T_DISCRETIZATION* engine;
-        ELASTIC_SOLVER<T_STATE_BINDER, T_STATE, T_DISCRETIZATION>* solver;
-
-        bool engineCreated;
-        bool engineInitialized;
+        using ENGINE_INTERFACE::T_FLAG;       
 
         // Datatypes
     public:
@@ -42,8 +22,8 @@ namespace PhysBAM{
         
         // Methods
     public:
-        ENGINE_INTERFACE_LOCAL();
-        virtual ~ENGINE_INTERFACE_LOCAL();
+        ENGINE_INTERFACE_MPI();
+        virtual ~ENGINE_INTERFACE_MPI();
         
         virtual void CreateEngine(T_INDEX bounds, T dx, TV min_corner, T mu, T lambda, T alpha, T cutoff_value, T stabilization);
         virtual void Initialize_Muscles();
@@ -90,12 +70,6 @@ namespace PhysBAM{
         virtual int Number_Of_Mesh_Nodes() const;
         virtual int Number_Of_Mesh_Cells() const;
 
-        bool Node_Is_Dirichlet(const T_INDEX& index) const;
-        bool Node_Is_Active(const T_INDEX& index) const;
-        bool Node_Is_Dirichlet_Mesh(const int& index) const;
-        bool Node_Is_Active_Mesh(const int& index) const;
-        VECTOR< ARRAY_VIEW< T, T_INDEX >, d >& U();
-        VECTOR< ARRAY_VIEW< T, int >, d >& U_Mesh();
         virtual void Output_Structures(GEOMETRY_PARTICLES<TV>& particles,ARRAY<STRUCTURE<TV>*>& collection_structures) const;
 
         virtual int CreateNewConstraint(CONSTRAINT_TYPE ctype);
@@ -126,16 +100,17 @@ namespace PhysBAM{
                                    ARRAY< ARRAY<TV>, T_INDEX>& muscle_fiber,
                                    ARRAY< ARRAY<TV>, int>& muscle_fiber_mesh);
 
-        virtual void GetMuscleActivations( ARRAY<T, int>& muscle_activations ) const;
+        virtual void GetMuscleActivations( ARRAY<T, int>& muscle_activations ) const ;
         virtual void SetMuscleActivations( ARRAY<T, int>& muscle_activations );
 
-        virtual void GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) const;
+        virtual void GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) const ;
         virtual void SetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress );
 
         virtual bool EngineReady() const;
-        virtual bool EngineInitialized() const;
+        virtual bool EngineInitialized() const ;
 
     };
 
 }
+#endif
 #endif

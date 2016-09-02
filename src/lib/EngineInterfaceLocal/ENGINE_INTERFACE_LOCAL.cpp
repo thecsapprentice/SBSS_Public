@@ -495,7 +495,7 @@ GetMuscleData(int& max_muscle,
               ARRAY< ARRAY<T>, T_INDEX >& muscle_density,
               ARRAY< ARRAY<T>, int >& muscle_density_mesh, 
               ARRAY< ARRAY<TV>, T_INDEX >& muscle_fiber,
-              ARRAY< ARRAY<TV>, int >& muscle_fiber_mesh ){
+              ARRAY< ARRAY<TV>, int >& muscle_fiber_mesh ) const {
 
     if( engineCreated ){
         max_muscle = engine->muscle_activations.m;
@@ -532,7 +532,7 @@ SetMuscleData(int& max_muscle,
 }
 
 void ENGINE_INTERFACE_LOCAL::
-GetMuscleActivations( ARRAY<T, int>& muscle_activations ){
+GetMuscleActivations( ARRAY<T, int>& muscle_activations ) const {
     if(engineCreated)
         muscle_activations = engine->muscle_activations;
 }
@@ -544,7 +544,7 @@ SetMuscleActivations( ARRAY<T, int>& muscle_activations ){
 }
 
 void ENGINE_INTERFACE_LOCAL::
-GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ){
+GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) const {
     if(engineCreated)
         fiber_max_stress = engine->muscle_fiber_max_stresses;
 }
@@ -559,7 +559,7 @@ bool ENGINE_INTERFACE_LOCAL::EngineReady() const{
     return engineCreated;   
 }
     
-bool ENGINE_INTERFACE_LOCAL::EngineInitialized(){
+bool ENGINE_INTERFACE_LOCAL::EngineInitialized() const {
     return engineInitialized;
 }
 

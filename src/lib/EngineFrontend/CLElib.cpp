@@ -61,9 +61,11 @@
 #include <Common_Geometry/Nonmanifold_Topology_Generation/CUTTER_BASIC_STRATEGY.h>
 #include <Common_Geometry/Nonmanifold_Topology_Generation/MATERIAL_PREDICATE_VOXELIZED_VOLUME.h>
 
+#ifdef ENABLE_SELF_COLLISIONS
 //TetGen
 #define TETLIBRARY
 #include <tetgen.h>
+#endif
 
 using namespace PhysBAM;
 
@@ -275,54 +277,108 @@ Create_Model(const std::vector<float>& vertices_input,const std::vector<int>& tr
         PHYSBAM_ASSERT(!triangle_mesh.node_on_boundary->Contains(true));
     }
 
+#ifdef ENABLE_SELF_COLLISIONS
     // Build Tetrahedralized Object
     // (w/ TetGen)
     GEOMETRY_PARTICLES<TV> tet_particles;
     TETRAHEDRALIZED_VOLUME<T>* tetvolume = TETRAHEDRALIZED_VOLUME<T>::Create(tet_particles);
 
     {
-      LOG::SCOPE scope("Running TetGen");
-      tetgenio tetgen_input, tetgen_output;
-      tetgen_input.numberofpoints = (vertices_input.size() / 3);
-      tetgen_input.pointlist = new REAL[ vertices_input.size() ];
-      for( int i = 0; i<vertices_input.size(); i++ )
-	tetgen_input.pointlist[i] = vertices_input[i];
+        LOG::SCOPE scope("Running TetGen");
+
+        GEOMETRY_PARTICLES<TV> triangle_particles;
+        TRIANGULATED_SURFACE<T>* triangle_surface=TRIANGULATED_SURFACE<T>::Create(triangle_particles);
+        for( int v=1;v<=vertices.m;v++){
+            int p = triangle_particles.array_collection->Add_Element();
+            for(int w=1;w<=d;w++)
+                triangle_particles.X(p)(w)=vertices(v)(w);
+        }        
+        for( int t=1;t<=triangles.m;t++){
+            triangle_surface->mesh.elements.Append(triangles(t));
+        }
+        triangle_surface->Update_Number_Nodes();
+        triangle_surface->Close_Surface(true, 1e-6, false, true );
+        triangle_surface->Update_Number_Nodes();
+
+
+        tetgenio tetgen_input, tetgen_output;
+        tetgen_input.numberofpoints = (triangle_particles.X.Size());
+        tetgen_input.pointlist = new REAL[ triangle_particles.X.Size() * 3 ];
+        for( int i = 0; i<triangle_particles.X.Size(); i++ )
+            for( int w = 0; w<d; w++)
+                tetgen_input.pointlist[i*d+w] = triangle_particles.X(i+1)(w+1);
       	
-      tetgen_input.numberoftrifaces = (triangles_input.size()/3);
-      tetgen_input.trifacelist = new int[ triangles_input.size() ];
-      memcpy( tetgen_input.trifacelist, triangles_input.data(), triangles_input.size()*sizeof(int) );
+        tetgen_input.numberoffacets = triangle_surface->mesh.elements.Size();
+        tetgen_input.facetlist = new tetgenio::facet[tetgen_input.numberoffacets];
+        tetgen_input.facetmarkerlist = new int[tetgen_input.numberoffacets];
+        for( int t = 0; t < triangle_surface->mesh.elements.Size(); t++){
+            auto f = &tetgen_input.facetlist[t];
+            f->numberofpolygons = 1;
+            f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
+            f->numberofholes = 0;
+            f->holelist = NULL;
+            auto p = &f->polygonlist[0];
+            p->numberofvertices = 3;
+            p->vertexlist = new int[p->numberofvertices];
+            p->vertexlist[0] = triangle_surface->mesh.elements(t+1)(1)-1;
+            p->vertexlist[1] = triangle_surface->mesh.elements(t+1)(2)-1;
+            p->vertexlist[2] = triangle_surface->mesh.elements(t+1)(3)-1;
+            tetgen_input.facetmarkerlist[t] = 0;
+        }
+        
+        tetgenbehavior switches;
+        switches.plc = 1;
+        switches.docheck = 1;
+        switches.verbose = 1;
+        
+        try{
+            tetrahedralize( "pq1.41a0.1dVc", &tetgen_input, &tetgen_output );
+        }
+        catch (int e ){
+            LOG::cout << "Tetgen failed with error code : " << e << std::endl;
+            LOG::cout.flush();
+            PHYSBAM_FATAL_ERROR();
+        }
+        
+        LOG::cout << tetgen_output.numberofpoints << "   " << vertices_input.size()/3 << std::endl;
+        
+        for( int v=0; v < tetgen_output.numberofpoints; v++ ){
+            int p = tet_particles.array_collection->Add_Element();
+            PHYSBAM_ASSERT( p == v+1 );
+            for( int w=0;w<d;w++)
+                tet_particles.X(p)(w+1)=tetgen_output.pointlist[ v*3 + w ];
+        }
+        for( int t=0; t<tetgen_output.numberoftetrahedra; t++){
+            tetvolume->mesh.elements.Append( VECTOR<int,4>(tetgen_output.tetrahedronlist[t*4+0]+1,
+                                                           tetgen_output.tetrahedronlist[t*4+1]+1,
+                                                           tetgen_output.tetrahedronlist[t*4+2]+1,
+                                                           tetgen_output.tetrahedronlist[t*4+3]+1 ));
+            PHYSBAM_ASSERT( tetgen_output.tetrahedronlist[t*4+0]+1 >= 1 && 
+                            tetgen_output.tetrahedronlist[t*4+0]+1 <= tetgen_output.numberofpoints );
+            PHYSBAM_ASSERT( tetgen_output.tetrahedronlist[t*4+1]+1 >= 1 && 
+                            tetgen_output.tetrahedronlist[t*4+1]+1 <= tetgen_output.numberofpoints );
+            PHYSBAM_ASSERT( tetgen_output.tetrahedronlist[t*4+2]+1 >= 1 && 
+                            tetgen_output.tetrahedronlist[t*4+2]+1 <= tetgen_output.numberofpoints );
+            PHYSBAM_ASSERT( tetgen_output.tetrahedronlist[t*4+3]+1 >= 1 && 
+                            tetgen_output.tetrahedronlist[t*4+3]+1 <= tetgen_output.numberofpoints );            
+        }
 
-      tetgenbehavior switches;
-      switches.plc = 0;
-      switches.docheck = 1;
-      switches.verbose = 1;
-      
-      tetrahedralize( &switches, &tetgen_input, &tetgen_output );
-
-      LOG::cout << tetgen_output.numberofpoints << "   " << vertices_input.size()/3 << std::endl;
-      
-      for( int v=0; v < tetgen_output.numberofpoints; v++ ){
-	int p = tet_particles.array_collection->Add_Element();
-	PHYSBAM_ASSERT( p == v+1 );
-	for( int w=0;w<d;w++)
-	  tet_particles.X(p)(w+1)=tetgen_output.pointlist[ v*3 + w ];
-      }
-      for( int t=0; t<tetgen_output.numberoftetrahedra; t++)
-	tetvolume->mesh.elements.Append( VECTOR<int,4>(tetgen_output.tetrahedronlist[t*4+0]+1,
-						       tetgen_output.tetrahedronlist[t*4+1]+1,
-						       tetgen_output.tetrahedronlist[t*4+2]+1,
-						       tetgen_output.tetrahedronlist[t*4+3]+1 ));
-      
-      tetvolume->Update_Number_Nodes();
-
+        
+        tetvolume->Update_Number_Nodes();
+        
       {
-	FILE_UTILITIES::Create_Directory("tetrahedralized_object/0");
-	DEFORMABLE_GEOMETRY_COLLECTION<TV> collection(tet_particles);
-	collection.Add_Structure(tetvolume);
-	collection.Write(stream_type,"tetrahedralized_object",0,0,true);
+          FILE_UTILITIES::Create_Directory("tetrahedralized_object/0");
+          DEFORMABLE_GEOMETRY_COLLECTION<TV> collection(tet_particles);
+          if(tetgen_output.numberoftetrahedra != 0 )
+              collection.Add_Structure(tetvolume);
+          collection.Add_Structure(triangle_surface);
+          collection.Write(stream_type,"tetrahedralized_object",0,0,true);
       }
+
+        if( tetgen_output.numberoftetrahedra == 0 )
+            PHYSBAM_FATAL_ERROR( "Tetgen failed to mesh the model.");
     }
-    
+#endif
     
     // Build High Res Render Surface
     {

@@ -93,7 +93,7 @@ namespace PhysBAM{
                                    ARRAY< ARRAY<T>, T_INDEX>& muscle_density,
                                    ARRAY< ARRAY<T>, int>& muscle_density_mesh, 
                                    ARRAY< ARRAY<TV>, T_INDEX>& muscle_fiber,
-                                   ARRAY< ARRAY<TV>, int>& muscle_fiber_mesh) = 0;
+                                   ARRAY< ARRAY<TV>, int>& muscle_fiber_mesh) const = 0;
 
         virtual void SetMuscleData(int& max_muscle,
                                    ARRAY< ARRAY<int>, T_INDEX>& muscle_ids,
@@ -103,14 +103,14 @@ namespace PhysBAM{
                                    ARRAY< ARRAY<TV>, T_INDEX>& muscle_fiber,
                                    ARRAY< ARRAY<TV>, int>& muscle_fiber_mesh) = 0;
 
-        virtual void GetMuscleActivations( ARRAY<T, int>& muscle_activations ) = 0;
+        virtual void GetMuscleActivations( ARRAY<T, int>& muscle_activations ) const = 0;
         virtual void SetMuscleActivations( ARRAY<T, int>& muscle_activations ) = 0;
 
-        virtual void GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) = 0;
+        virtual void GetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) const = 0;
         virtual void SetMuscleFiberMaxStress( ARRAY<T, int>& fiber_max_stress ) = 0;
 
         virtual bool EngineReady() const = 0;
-        virtual bool EngineInitialized() = 0;
+        virtual bool EngineInitialized() const = 0;
 
     };
 

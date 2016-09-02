@@ -1,5 +1,6 @@
 
 add_subdirectory( opengl_3d )
+add_subdirectory( SBSS_MPI_Accelerator )
 
 add_custom_target(electron-prebuild ALL
  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

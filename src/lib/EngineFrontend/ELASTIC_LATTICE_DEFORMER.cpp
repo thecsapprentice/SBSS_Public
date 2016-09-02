@@ -8,7 +8,7 @@
 
 #include <EngineInterface/CONSTRAINTS.h>
 
-#ifdef ENABLE_MPI
+#ifdef ENABLE_MPI_OFFLOAD
 #include <EngineInterfaceMPI/ENGINE_INTERFACE_MPI.h>
 #else
 #include <EngineInterfaceLocal/ENGINE_INTERFACE_LOCAL.h>
@@ -33,7 +33,7 @@ ELASTIC_LATTICE_DEFORMER::ELASTIC_LATTICE_DEFORMER() : engine_created(false), so
     display_strain = &strain_B;
     simulation_queue = new PTHREAD_QUEUE(1);
     collision_proxy_set = false;
-#ifdef ENABLE_MPI
+#ifdef ENABLE_MPI_OFFLOAD
     discretization = new ENGINE_INTERFACE_MPI();
 #else 
     discretization = new ENGINE_INTERFACE_LOCAL();
