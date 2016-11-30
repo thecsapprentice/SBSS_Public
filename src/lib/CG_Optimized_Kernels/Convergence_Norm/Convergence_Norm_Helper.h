@@ -234,11 +234,15 @@ class Vector_Convergence_Norm_Op
      
 
 #else
-     double t_result[stride];
-     memset(t_result, 1e-10, stride*sizeof(double));
      double result=1e-10;
-     double t_result_p[number_of_partitions_input][stride];
-     memset(t_result_p, 1e-10, number_of_partitions_input*stride*sizeof(double));
+     std::array<double, stride> t_result;
+     t_result.fill( result );    
+     std::vector< std::array<double, stride> > t_result_p(number_of_partitions_input, t_result);
+//     double t_result[stride];
+//     memset(t_result, 1e-10, stride*sizeof(double));
+//     double result=1e-10;
+//     double t_result_p[number_of_partitions_input][stride];
+//     memset(t_result_p, 1e-10, number_of_partitions_input*stride*sizeof(double));
 
      int partition_offsets[number_of_partitions_input];
      int partition;

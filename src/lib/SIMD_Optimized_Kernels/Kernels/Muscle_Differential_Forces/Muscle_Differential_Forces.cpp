@@ -33,13 +33,13 @@ template<class Tw,class T_DATA=void,class I_DATA=void>
     typedef Number<Tw> Tn;
 
     // Gradient Part
-    T_DATA dF[9];
+    BUILD_TDATA(dF,[9]);
     Unweighted_Gradient<Tw,T_DATA,I_DATA>(du,
                                          dF,
                                          one_over_h);
 
     // Differential Part
-    T_DATA dP_fiber[9];
+    BUILD_TDATA(dP_fiber,[9]);
     Muscle_Differential<Tw,T_DATA,I_DATA>(dP_fiber,
                                          dF,
                                          fiber,
@@ -47,7 +47,7 @@ template<class Tw,class T_DATA=void,class I_DATA=void>
                                          c1,
                                          c2);
 
-    T_DATA scale;
+    BUILD_TDATA(scale,);
     Tn CellVolume;
     CellVolume.Load(cell_volume);
     CellVolume = Tn() - CellVolume;

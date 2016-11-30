@@ -16,6 +16,7 @@
 
 #include "ENGINE_INTERFACE_LOCAL.h"
 
+#include <omp.h>
 
 namespace PhysBAM{
 
@@ -60,7 +61,8 @@ void  ENGINE_INTERFACE_LOCAL::
 InitializeEngine(){
     if( engineCreated ){
         solver = new ELASTIC_SOLVER<T_STATE_BINDER, T_STATE, T_DISCRETIZATION>(engine, false);
-        solver->Initialize(16);
+        int max_threads = omp_get_max_threads();
+        solver->Initialize(max_threads);
         engineInitialized = true;
     }
 }

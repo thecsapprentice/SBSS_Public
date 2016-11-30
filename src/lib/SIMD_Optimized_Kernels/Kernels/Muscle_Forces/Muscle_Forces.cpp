@@ -41,7 +41,7 @@ void Muscle_Forces(T_DATA (&f)[3][8], const T_DATA (&fiber)[3],
     F_fiber0.Load(Ffiber[0]); F_fiber1.Load(Ffiber[1]); F_fiber2.Load(Ffiber[2]);
     C1.Load( c1 );
     
-    T_DATA P_fiber[9];
+    BUILD_TDATA(P_fiber,[9]);
 
     vP_fiber = vfiber * F_fiber0 * C1;
     vP_fiber.Store(P_fiber[M_I(0,0)], P_fiber[M_I(0,1)], P_fiber[M_I(0,2)]);
@@ -52,7 +52,7 @@ void Muscle_Forces(T_DATA (&f)[3][8], const T_DATA (&fiber)[3],
     vP_fiber = vfiber * F_fiber2 * C1;
     vP_fiber.Store(P_fiber[M_I(2,0)], P_fiber[M_I(2,1)], P_fiber[M_I(2,2)]);
 
-    T_DATA scale;
+    BUILD_TDATA(scale,);
     Tn CellVolume;
     CellVolume.Load(cell_volume);
     CellVolume = Tn() - CellVolume;

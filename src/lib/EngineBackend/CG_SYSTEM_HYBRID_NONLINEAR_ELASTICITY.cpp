@@ -368,6 +368,7 @@ Project_Nullspace(VECTOR_BASE& x) const {}
 template<class T_ELASTICITY>  void CG_SYSTEM<T_ELASTICITY >::
 Apply_Preconditioner(const VECTOR_BASE& y, VECTOR_BASE& x) const
 {
+#if 0
     //LOG::SCOPE scope("CG_SYSTEM::Apply_Preconditioner");
 
     if( D == NULL )
@@ -480,7 +481,7 @@ Apply_Preconditioner(const VECTOR_BASE& y, VECTOR_BASE& x) const
         norm = Convergence_Norm(krylov_r); 
         ENABLE_NORM(LOG::cout << "  G " << norm << std::endl);
     }
-
+#endif
 }
 //#####################################################################
 //template class CG_SYSTEM<float,2>;

@@ -115,7 +115,9 @@ void Muscle_Update_Position_Based_State(    const T_DATA (&u)[3][8],
 
         Tn rc1 = rtension / rstretch;
         Tn rc2 = (rtension_derivative-rc1) / stretch_squared;
-        
+        rc2 = max( rc2, Tn() );
+                
+
         Tn Zero;
         Tn rdensity;
         rdensity.Load(density);
@@ -128,8 +130,8 @@ void Muscle_Update_Position_Based_State(    const T_DATA (&u)[3][8],
         rc2 = blend(IsZero, rc2, Zero);
 
         rFfiber.Store(F_fiber);
-        Store(c1, rtension);
-        Store(c2, rtension_derivative);
+        Store(c1, rc1);
+        Store(c2, rc2);
 
 };
 
