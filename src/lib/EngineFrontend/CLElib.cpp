@@ -1975,7 +1975,7 @@ Advance_One_Time_Step()
         //std::cout << std::endl << int(frame_counter / write_rate) << "   " << discretization.Constraint_Count() <<std::endl;
 
         //discretization.Exact_Solve(50,1,1e-5,5e-5, true);
-        Schedule_Exact_Solve(50,2,1e-5f,5e-5f,frame_counter);
+        Schedule_Exact_Solve(50,2,1e-2f,5e-2f,frame_counter);
 
         //Update_Fine_Displacement();
 

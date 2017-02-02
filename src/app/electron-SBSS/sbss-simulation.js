@@ -290,9 +290,12 @@ SBSS_Simulation.prototype.UpdateSutures = function() {
     var suture_uvs = new Float32Array( self.cle.Get_Suture_UV(suture_ids).buffer )
     var suture_triangles = new Int32Array( self.cle.Get_Suture_Triangles(suture_ids).buffer )
     suture_ids = new Uint32Array(suture_ids.buffer)
-   
+    console.log( suture_triangles.length )
+
     sutures = [];   
     for( var i=0; i < suture_ids.length; i++ ){
+        console.log( suture_triangles[i*2+0] )
+        console.log( suture_triangles[i*2+1] )
         if( suture_triangles[i*2+0] != -1 && suture_triangles[i*2+1] != -1 )
             sutures.push( {"suture": suture_ids[i],
                            "triangleA": suture_triangles[i*2+0], "uvA": Array.prototype.slice.call( suture_uvs, i*6+0, i*6+3 ),

@@ -522,8 +522,11 @@ ELASTIC_SOLVER<BINDER,STATE,DISCRETIZATION>::Exact_Solve( int krylov_iterations,
             //DiagonalDualMatrix *= Omega;
 
             engine->Add_Force(*u_internal, *b);
-        
-            norm = krylov_system.Convergence_Norm(krylov_b);
+
+            krylov_x.Clear(); // We will reuse the x temporarily to compute a projected norm
+            krylov_x += krylov_b;
+            krylov_system.Project(krylov_x);
+            norm = krylov_system.Convergence_Norm(krylov_x);
             LOG::cout << norm << std::endl;
             if( norm < newton_tolerance)
                 break;

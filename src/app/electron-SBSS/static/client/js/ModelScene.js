@@ -600,7 +600,7 @@ ModelScene.prototype.createSharpEdgeHelper = function( ) {
 	}
     }
     geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
-    this.sharpedge_helper = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xff00ff, linewidth: 3 } ), THREE.LinePieces );
+    this.sharpedge_helper = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xff00ff, linewidth: 3 } ), THREE.LineSegments );
     this.masterscene.scene.add( this.sharpedge_helper );
 }
 

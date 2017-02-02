@@ -487,7 +487,7 @@ void CLEjs::__Get_Suture_Triangles(const Nan::FunctionCallbackInfo<v8::Value>& i
     std::vector< std::array<int,2> > triangles;
     obj->Get_Dual_Point_Constraint_Triangles( suture_ids, triangles );
     info.GetReturnValue().Set(Nan::CopyBuffer(reinterpret_cast<const char*>(triangles.data()),
-                                              triangles.size()*sizeof(int)).ToLocalChecked());
+                                              triangles.size()*2*sizeof(int)).ToLocalChecked());
 };
 
 void CLEjs::__Get_Active_Sutures(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -65,7 +65,7 @@ ToolScene.prototype.initialize = function(){
     points.push( new THREE.Vector3(.1,0,0) );
     points.push( new THREE.Vector3(.3,0,1) );
     points.push( new THREE.Vector3(0,0,1) );
-    this.hook_geometry = new THREE.IcosahedronGeometry(0.5, 1);//new THREE.LatheGeometry( points, 8 );
+    this.hook_geometry = new THREE.IcosahedronGeometry(0.2, 1);//new THREE.LatheGeometry( points, 8 );
     this.hook_geometry.mergeVertices();
     this.hook_geometry.computeFaceNormals();
     this.hook_geometry.computeVertexNormals();
@@ -282,7 +282,7 @@ ToolScene.prototype.updateKeyFlags = function(event){
 
 ToolScene.prototype.handleKeyDown = function( event ) {
     var mode = this.getMode();
-    console.log( event );
+    //console.log( event );
     console.log( "Key Down ( " + event.key + "/" + event.keyIdentifier + " ), Mode: " + JSON.stringify(mode)  );
     this.updateKeyFlags(event);
    
@@ -334,7 +334,7 @@ ToolScene.prototype.handleKeyUp = function( event ) {
 
 ToolScene.prototype.handleMouseMove = function( event ) {
     var mode = this.getMode();
-    console.log( "Mouse Move, Mode: " + JSON.stringify(mode)  );
+    //console.log( "Mouse Move, Mode: " + JSON.stringify(mode)  );
     this.updateKeyFlags(event);
     this.mouse.x = event.offsetX;
     this.mouse.y = event.offsetY;
@@ -438,7 +438,7 @@ ToolScene.prototype.handleMouseDown = function( event ) {
         this.findManipulatorSelection();
         if( this.selected_hook != null){ // Prepare for potential drag operation
             this.incMode();            
-            this.masterscene.LockControls( this.selected_hook.position, true );
+            //this.masterscene.LockControls( this.selected_hook.position, true );
 	    if( this.keyflags.shift )
 		this.masterscene.SetControls(false);
         }
@@ -556,7 +556,7 @@ ToolScene.prototype.findManipulatorSelection = function(){
             this.selected_hook_position = new THREE.Vector3().copy( this.selected_hook.position );
         }
         if( suture_index > -1 ){
-            this.selected_suture_index = this.hooks[suture_index].suture_id;
+            this.selected_suture_index = this.sutures[suture_index].suture_id;
             if( this.selected_suture != null ){
                 this.selected_suture.children[0].material = this.suture_material;
                 this.selected_suture.children[1].material = this.suture_material;
@@ -1015,6 +1015,28 @@ ToolScene.prototype.updateSutures = function() {
     this.sutures.length=0; 
 
     var getSutureMesh = function( suture_object, pntA, pntB, scaling_factor ){
+        /*
+        let sut = new THREE.Object3D();
+        sut.position.copy( pntA );
+
+        let suture_sphere = new THREE.IcosahedronGeometry( .002, 1);
+        let endpoint_meshA = new THREE.Mesh( suture_sphere, this.suture_material );
+        sut.add(endpoint_meshA);
+        sut.children[0].position.set(0.0,0.0,0.0);
+
+        let endpoint_meshB = new THREE.Mesh( suture_sphere, this.suture_material );
+        sut.add(endpoint_meshB);
+        sut.children[1].position.subVectors( pntB, pntA );
+
+        let body_path = new THREE.LineCurve3( sut.children[0].position.clone(),
+                                              sut.children[1].position.clone() )
+        let suture_body = new THREE.TubeGeometry( body_path, 20, .001, 8, false );
+        let body_mesh = new THREE.Mesh( suture_body, this.suture_material );
+        sut.add( body_mesh )
+      
+        return sut;
+        */
+        
         var sut = suture_object.clone();
         sut.position.copy( pntA );
         sut.children[0].position.set(0.0,0.0,0.0);
@@ -1032,6 +1054,7 @@ ToolScene.prototype.updateSutures = function() {
             center.normalize();
             sut.children[2].quaternion.setFromUnitVectors(new THREE.Vector3(0.0, 1.0, 0.0),center); }
         return sut;
+        
     }
 
     this.suture_data.forEach( function( item, index, array){

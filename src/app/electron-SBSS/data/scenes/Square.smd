@@ -13,7 +13,7 @@
             [ [-0.125000, -0.025000, -0.125000], [-0.125000, -0.025000, -0.121212] ]
         ]        
     },
-    "physicsNodeSpacing" : 0.00225,
+    "physicsNodeSpacing" : 0.011,
     "incisionWidth" : 0.0036,
     "textureFiles" : {
         "rplastyTextureTop2.bmp" : 1,

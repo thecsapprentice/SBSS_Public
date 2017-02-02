@@ -249,6 +249,9 @@ SBSS_Server.prototype.UpdateHooks = function( hook_data ){
 }
 
 SBSS_Server.prototype.UpdateSutures = function( suture_data ){
+    console.log( "Update sutures: " )
+    console.log( suture_data )
+
     var self = this;
     self.state_data.sutures = []
     for( suture in suture_data )
