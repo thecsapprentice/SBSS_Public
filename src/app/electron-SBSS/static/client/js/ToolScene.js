@@ -65,7 +65,7 @@ ToolScene.prototype.initialize = function(){
     points.push( new THREE.Vector3(.1,0,0) );
     points.push( new THREE.Vector3(.3,0,1) );
     points.push( new THREE.Vector3(0,0,1) );
-    this.hook_geometry = new THREE.IcosahedronGeometry(1.0, 1);//new THREE.LatheGeometry( points, 8 );
+    this.hook_geometry = new THREE.IcosahedronGeometry(0.5, 1);//new THREE.LatheGeometry( points, 8 );
     this.hook_geometry.mergeVertices();
     this.hook_geometry.computeFaceNormals();
     this.hook_geometry.computeVertexNormals();
@@ -436,9 +436,11 @@ ToolScene.prototype.handleMouseDown = function( event ) {
 
         // Try to select hooks and sutures
         this.findManipulatorSelection();
-        if( this.selected_hook != null ){ // Prepare for potential drag operation
+        if( this.selected_hook != null){ // Prepare for potential drag operation
             this.incMode();            
             this.masterscene.LockControls( this.selected_hook.position, true );
+	    if( this.keyflags.shift )
+		this.masterscene.SetControls(false);
         }
         else{
             this.clearMode();

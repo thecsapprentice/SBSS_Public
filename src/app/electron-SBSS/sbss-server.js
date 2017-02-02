@@ -292,7 +292,7 @@ SBSS_Server.prototype.Initialize = function(options) {
     var self = this;
     self.globaltimestamp = 0;
     self.director = options.director;
-    self.wss = ws.Server({
+    self.wss = new ws.Server({
         port:options.port,
         verifyClient:this.VerifyClient.bind(this)
     });

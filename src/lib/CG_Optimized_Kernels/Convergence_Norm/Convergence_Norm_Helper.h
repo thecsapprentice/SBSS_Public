@@ -11,6 +11,8 @@
 #include "../Kernel_Base/Kernel_Mesh_Base_Reducer_Helper.h"
 #include "../Kernel_Base/Kernel_Serial_Base_Reducer_Helper.h"
 #include "../Kernel_Base/Kernel_OpenMP_Base_Reducer_Helper.h"
+#include <array>
+#include <vector>
 
 namespace MT_Streaming_Kernels{
 

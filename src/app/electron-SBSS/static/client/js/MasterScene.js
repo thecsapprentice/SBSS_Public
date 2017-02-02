@@ -148,7 +148,7 @@ MasterScene.prototype.ProcessUpdate = function() {
                 console.log( err );
             }
             else{
-                console.log( "Update applied successfully for timestamp: ", data.timestamp )
+                //console.log( "Update applied successfully for timestamp: ", data.timestamp )
             }
             self.processingUpdate = false;
         }
@@ -198,9 +198,7 @@ MasterScene.prototype.update = function(timestamp){
 }
 
 MasterScene.prototype.updateControls = function(timestamp){
-    if( this.controls_active ){
-        this.controls.update();
-    }
+    this.controls.update();
 }
 
 MasterScene.prototype.FreeControls = function( enable_mouse_move_events ){
@@ -245,5 +243,6 @@ MasterScene.prototype.LockControls = function( lock_point, enable_mouse_move_eve
 }
 
 MasterScene.prototype.SetControls = function(active){
-    this.controls_active = active;
+    if( this.controls )
+	this.controls.enabled = active;
 }
