@@ -586,11 +586,13 @@ ModelScene.prototype.createSharpEdgeHelper = function( ) {
     var positions = this.dynamic_geometry.attributes[ "position" ].array;
 
     var geometry = new THREE.BufferGeometry();
-    var coords = new Float32Array( Object.keys(this.sharp_edge_hash).length * 2 * 3 );
+    var max_positions = Object.keys(this.sharp_edge_hash).length * 2 * 3;
+    console.log( "Max vertices: " + max_positions );
+    var coords = new Float32Array( max_positions );
     var index = 0;
     for ( var key in this.sharp_edge_hash ) {
         var h = this.sharp_edge_hash[ key ];
-        if ( h.face2 === undefined  ) { // hardwired const OK
+        if ( h.face2 === undefined  ) { // hardwired const OK                       
             coords[ index ++ ] = positions[ h.vert1*3+0 ];
 	    coords[ index ++ ] = positions[ h.vert1*3+1 ];
 	    coords[ index ++ ] = positions[ h.vert1*3+2 ];          
@@ -599,8 +601,9 @@ ModelScene.prototype.createSharpEdgeHelper = function( ) {
 	    coords[ index ++ ] = positions[ h.vert2*3+2 ];            
 	}
     }
-    geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
-    this.sharpedge_helper = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xff00ff, linewidth: 3 } ), THREE.LineSegments );
+    var clean_coords = coords.slice(0,index);
+    geometry.addAttribute( 'position', new THREE.BufferAttribute( clean_coords, 3 ) );
+    this.sharpedge_helper = new THREE.LineSegments( geometry, new THREE.LineBasicMaterial( { color: 0xff00ff, linewidth: 3 } ), THREE.LineSegments );
     this.masterscene.scene.add( this.sharpedge_helper );
 }
 

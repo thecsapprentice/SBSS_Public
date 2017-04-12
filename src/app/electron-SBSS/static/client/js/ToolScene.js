@@ -354,11 +354,11 @@ ToolScene.prototype.handleMouseMove = function( event ) {
         }
 
         // Update move plane
-        intersection = this.getIntersection( this.mouse, this.hooks );
-        if( intersection.object != null && intersection.object != this.selected_hook ){
-	    this.plane.position.copy( intersection.object.position );
-	    this.plane.lookAt( this.masterscene.camera.position );
-        }
+        //intersection = this.getIntersection( this.mouse, this.hooks );
+        //if( intersection.object != null && intersection.object != this.selected_hook ){
+	//    this.plane.position.copy( intersection.object.position );
+	//    this.plane.lookAt( this.masterscene.camera.position );
+        //}
 
         break;
     case 1: // This is the place new hook mode
@@ -1014,29 +1014,29 @@ ToolScene.prototype.updateSutures = function() {
     }.bind(this));
     this.sutures.length=0; 
 
-    var getSutureMesh = function( suture_object, pntA, pntB, scaling_factor ){
-        /*
+    var getSutureMesh = function( suture_object, pntA, pntB, scaling_factor, material ){
+        
         let sut = new THREE.Object3D();
         sut.position.copy( pntA );
 
         let suture_sphere = new THREE.IcosahedronGeometry( .002, 1);
-        let endpoint_meshA = new THREE.Mesh( suture_sphere, this.suture_material );
+        let endpoint_meshA = new THREE.Mesh( suture_sphere, material );
         sut.add(endpoint_meshA);
         sut.children[0].position.set(0.0,0.0,0.0);
 
-        let endpoint_meshB = new THREE.Mesh( suture_sphere, this.suture_material );
+        let endpoint_meshB = new THREE.Mesh( suture_sphere, material );
         sut.add(endpoint_meshB);
         sut.children[1].position.subVectors( pntB, pntA );
 
         let body_path = new THREE.LineCurve3( sut.children[0].position.clone(),
                                               sut.children[1].position.clone() )
         let suture_body = new THREE.TubeGeometry( body_path, 20, .001, 8, false );
-        let body_mesh = new THREE.Mesh( suture_body, this.suture_material );
+        let body_mesh = new THREE.Mesh( suture_body, material );
         sut.add( body_mesh )
       
         return sut;
-        */
         
+        /*
         var sut = suture_object.clone();
         sut.position.copy( pntA );
         sut.children[0].position.set(0.0,0.0,0.0);
@@ -1054,14 +1054,14 @@ ToolScene.prototype.updateSutures = function() {
             center.normalize();
             sut.children[2].quaternion.setFromUnitVectors(new THREE.Vector3(0.0, 1.0, 0.0),center); }
         return sut;
-        
+        */
     }
 
     this.suture_data.forEach( function( item, index, array){
         var getPosition = function( dynGeometry, tri, uv ){
             var indices = dynGeometry.getIndex().array;
             var positions = dynGeometry.getAttribute( "position" ).array;
-            var uv3 = new THREE.Vector3( 1.0 - (uv[0]+uv[1]), uv[0], uv[1] );
+            var uv3 = new THREE.Vector3( uv[0], uv[1], uv[3] );
             vA = new THREE.Vector3().fromArray(positions, indices[tri*3+0]*3)
             vB = new THREE.Vector3().fromArray(positions, indices[tri*3+1]*3)
             vC = new THREE.Vector3().fromArray(positions, indices[tri*3+2]*3)
@@ -1075,7 +1075,7 @@ ToolScene.prototype.updateSutures = function() {
                               item.triangleA,item.uvA);
         var ptB = getPosition(this.masterscene.modelscene.dynamic_geometry,
                               item.triangleB,item.uvB);
-        var sutMesh = getSutureMesh(this.suture_object, ptA, ptB, this.scaling_factor );
+        var sutMesh = getSutureMesh(this.suture_object, ptA, ptB, this.scaling_factor, this.suture_material );
         sutMesh.suture_id = item.id;
         this.sutures.push( sutMesh );
     }.bind(this));

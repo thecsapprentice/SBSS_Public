@@ -25,7 +25,7 @@
             "normalMap" : 2
         }
     },
-    "physicsNodeSpacing" : 0.007,
+    "physicsNodeSpacing" : 0.003,
     "incisionWidth" : 0.002,
     "hookStiffness" : 1e4,
     "sutureStiffness" : 1e5,
