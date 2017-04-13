@@ -71,7 +71,8 @@ using namespace PhysBAM;
 
 #define GRID_IN_GRID
 // Set to 1<<30 for full logging.
-#define LOG_DEPTH 1<<30
+#define LOG_DEPTH 0
+//#define LOG_DEPTH 1<<30
 #define LOG_FILE "CLElib.log"
 
 template<class T>
@@ -808,9 +809,9 @@ Create_Model(const std::vector<float>& vertices_input,const std::vector<int>& tr
 
 
 #else
-    elastic_lattice_deformer.vrg = new VOXELIZED_REGION_GENERATOR<T,d>( coarsen_ratio,
-                                                                        elastic_lattice_deformer.fine_grid,
-                                                                        elastic_lattice_deformer.voxmap );
+    elastic_lattice_deformer.vrg.reset( new VOXELIZED_REGION_GENERATOR<T,d>( coarsen_ratio,
+									     elastic_lattice_deformer.fine_grid,
+									     elastic_lattice_deformer.voxmap )  );
     elastic_lattice_deformer.vrg->Generate();
 
     // Fill out the mesh stuff here!!!
@@ -2072,7 +2073,6 @@ Generate_UFine_MeshMap()
     const PRIMARY_ELASTICITY& discretization=elastic_lattice_deformer.Discretization();
     const ARRAY<T_INDEX>& embedding_map=elastic_lattice_deformer.render_embedding_map;
     ARRAY< T, T_INDEX >& fine_to_coarsemesh=elastic_lattice_deformer.fine_to_coarsemesh;
-    const VOXELIZED_REGION_GENERATOR<T,d>& vrg=*(elastic_lattice_deformer.vrg);
 
     fine_to_coarsemesh.Resize(elastic_lattice_deformer.unpadded_fine_domain, true, false, -1);
 

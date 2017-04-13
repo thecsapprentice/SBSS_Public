@@ -21,6 +21,11 @@ SBSS_History.prototype.Next = function() {
     }        
 }
 
+SBSS_History.prototype.Reset = function() {
+    var self = this;
+    self.current_command = 0;
+}
+
 SBSS_History.prototype.Clear = function() {
     var self = this;
     self.command_queue.length = 0;

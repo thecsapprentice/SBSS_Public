@@ -52,6 +52,15 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
         else
             console.log( "History Advanced, but no commands remaining.")
         break;
+    case 'historyLoopNext':
+	self.history.List();
+	if( self.history.CommandsRemaining() <= 0 )
+	    self.history.Reset();
+	
+	if( self.history.CommandsRemaining() > 0 ){
+            var cmd = self.history.Next();
+            self.ProcessCommandMessage(cmd.command, cmd.data, false)
+        }   
     case 'loadScene':        
         request('http://localhost:8081/scene/' + data.name, function (error, response, body) {
             if (!error && response.statusCode == 200) {
@@ -117,12 +126,17 @@ SBSS_Director.prototype.ProcessCommandMessage = function( command, data, history
 SBSS_Director.prototype.LoadScene = function(scene){
     var self=this;
     console.log( scene );
+    self.simulation.Teardown();
     self.server.ResetConnections();
-    self.simulation.LoadScene( scene, function(error){
+    self.simulation.LoadScene( scene, function(error){ // On Failure
         if( error ){
             console.log( "Load Scene failed!" );
             console.log( error );                    
-        }});
+        }
+    },function(){ // On Success
+	self.simulation.StartUpdates();
+    }
+			     );
 }
                          
 

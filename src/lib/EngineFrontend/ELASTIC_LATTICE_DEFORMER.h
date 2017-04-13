@@ -169,7 +169,7 @@ class ELASTIC_LATTICE_DEFORMER:public EMBEDDED_DEFORMER_BASE
     int refinement;
     T_SCALAR_VARIABLE fine_to_coarsemesh;
 
-    VOXELIZED_REGION_GENERATOR<T,d>* vrg;
+    std::unique_ptr<VOXELIZED_REGION_GENERATOR<T,d> > vrg;
     VECTOR<HASHTABLE<T_INDEX,GENERIC_CELL<T,d> >,2> cell_is_mesh_from;
 
     bool engine_created;
@@ -200,8 +200,7 @@ public:
         simulation_queue->Wait();
         Discretization().DestroyEngine();
         engine_created = false;
-        delete vrg;
-        vrg=NULL;
+        vrg.reset();
         fine_point_constraints.Clean_Memory();
         constraint_index_of_hook_id.Clean_Memory();
         constraint_index_of_suture_id.Clean_Memory();

@@ -44,7 +44,10 @@ GUI.prototype.initialize = function() {
     this.buttons[11].addEventListener("click", this.debugFn.bind(this), false);
     this.buttons[12] = document.getElementById("disconnect");
     this.buttons[12].addEventListener("click", function() { window.location.assign("/"); }, false );
+    this.buttons[13] = document.getElementById("loop");
+    this.buttons[13].addEventListener("click", this.loopButton.bind(this), false);
 
+    
     $('#exampleBox').on('show.bs.modal', this.initializeExampleBox.bind(this) )
     $('#sceneBox').on('show.bs.modal', this.initializeSceneBox.bind(this) )
     $('#displaysettings').click( function(event) {
@@ -224,6 +227,27 @@ GUI.prototype.nextButton = function() {
     var msg = {
         command: "historyNext",
         data : {}
+    };
+    var jsonStr = JSON.stringify(msg);
+    this.masterscene.comm.send(jsonStr);
+}
+
+GUI.prototype.loopButton = function() {
+    if( $(this.buttons[13]).hasClass("disabled") ){
+        $(this.buttons[13]).removeClass("disabled")
+	this.loop_handle = setInterval( this.FireLoopNext.bind( this ), 2500 );
+    }
+    else{
+	$(this.buttons[13]).addClass("disabled")
+	clearInterval( this.loop_handle );
+	this.loop_handle = undefined;
+    }
+}
+
+GUI.prototype.FireLoopNext = function() {
+    var msg = {
+	command: "historyLoopNext",
+	data: {}
     };
     var jsonStr = JSON.stringify(msg);
     this.masterscene.comm.send(jsonStr);

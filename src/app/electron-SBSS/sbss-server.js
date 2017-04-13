@@ -85,7 +85,7 @@ function StateData(){
     this.JSONify = function(since){
         json_data = {}
 
-        console.log( "Dynamic Timestamp", this.dynamic.maxTimestamp() );
+        //console.log( "Dynamic Timestamp", this.dynamic.maxTimestamp() );
         
         if( this.dynamic.maxTimestamp() > since ){
             json_data.dynamic = {}
@@ -140,7 +140,7 @@ function SBSS_Server() {
 
 SBSS_Server.prototype.UpdateData = function() {
     var self=this;
-    console.log( "Current State is at", self.state_data.maxTimestamp() );
+    //console.log( "Current State is at", self.state_data.maxTimestamp() );
    
     for( var connectionID in self.connections )
         self.UpdateClient( connectionID )
@@ -150,13 +150,13 @@ SBSS_Server.prototype.UpdateClient = function(connectionID) {
     var self=this;
 
     //Update Data on each connection if its revision is older than the current dataset
-    console.log( "Connection", connectionID, "is at", self.connections[connectionID].revision );
+    //console.log( "Connection", connectionID, "is at", self.connections[connectionID].revision );
     var connection_update = self.state_data.JSONify( self.connections[connectionID].revision )
     //console.log( connection_update );
     if( connection_update.timestamp > self.connections[connectionID].revision )
         self.connections[connectionID].socket.send( JSON.stringify(connection_update) );
     self.connections[connectionID].revision = connection_update.timestamp;
-    console.log( "Connection", connectionID, "is now at", self.connections[connectionID].revision );  
+    //console.log( "Connection", connectionID, "is now at", self.connections[connectionID].revision );  
 }
 
 SBSS_Server.prototype.UpdateTopology = function(topology){

@@ -44,7 +44,7 @@ SBSS_Simulation.prototype.StopUpdates = function( ){
     self.update_handle = undefined;
 }
 
-SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
+SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback, success_callback){
     var self = this;
     console.log( "Loading scene...");
 
@@ -94,13 +94,13 @@ SBSS_Simulation.prototype.LoadScene = function(scene, fail_callback){
             fail_callback( "Failed to load some models. Loading scene can't continue!" )
         }
         else{
-            this._LoadScene_Phase2( scene, object_fetch_list, results, fail_callback );
+            this._LoadScene_Phase2( scene, object_fetch_list, results, fail_callback, success_callback );
         }
     }.bind(this));
 
 }
 
-SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model_data, callback ){
+SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model_data, fail_callback, success_callback ){
     var self = this;
 
     // Scene paramters
@@ -133,7 +133,7 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
         }
     }
     if( dynamic_model_index == -1 )
-        callback( "Failed to parse and load dynamic model: No dynamic model found." );
+        fail_callback( "Failed to parse and load dynamic model: No dynamic model found." );
 
     self.cutter.ParseFile(model_data[dynamic_model_index], self.incisionWidth);
     
@@ -195,7 +195,8 @@ SBSS_Simulation.prototype._LoadScene_Phase2 = function( scene, model_list, model
                                      elem.normal );
     });
 
-    self.server.UpdateData();    
+    self.server.UpdateData();
+    success_callback();
 }
 
 SBSS_Simulation.prototype.Incise = function( path_triangles, path_uv, path_positions, path_normals, T_in, T_out ){
@@ -380,7 +381,7 @@ SBSS_Simulation.prototype.Update = function() {
         var data = self.cle.Get_Vertex_Data(self.cle.V_DATA_POSITION, self.frame );
 
         if( self.frame != data.frame ){
-            console.log( "New frame data ready. Updating." );
+            //console.log( "New frame data ready. Updating." );
             var splitVertexData = self.cutter.RemapVertexData(data.vdata);
             self.server.UpdateVertices(Array.prototype.slice.call(new Float32Array(splitVertexData.buffer)));
             self.server.UpdateData();
@@ -390,6 +391,15 @@ SBSS_Simulation.prototype.Update = function() {
 
 
 
+}
+
+SBSS_Simulation.prototype.Teardown = function() {
+    console.log( "Simulation Teardown." )
+    var self = this;
+    self.StopUpdates();
+    self.physicsActive = false;
+    self.cle.Destroy_Model();	// no need to destroy a non-existent model
+    self.frame = 0;
 }
 
 // Exports

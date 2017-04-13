@@ -86,14 +86,10 @@ Nan::Persistent<v8::Function> Legacy_Cutter::constructor;
 
 Legacy_Cutter::Legacy_Cutter()  {
     std::cout << "Legacy_Cutter::Constructor" << std::endl;
-    _incis = new incision();
-    _sg = new skinGraphics();
 }
 
 Legacy_Cutter::~Legacy_Cutter() {
     std::cout << "Legacy_Cutter::Destructor" << std::endl;
-    delete _incis;
-    delete _sg;
 } 
 
 
@@ -142,6 +138,9 @@ void Legacy_Cutter::__ParseFile( const Nan::FunctionCallbackInfo<v8::Value>& inf
     Legacy_Cutter* obj = ObjectWrap::Unwrap<Legacy_Cutter>(info.Holder());   
     std::string tempString(*v8::String::Utf8Value(info[0]));
     float incisionWidth = info[1]->IsUndefined() ? 0.0036 : info[1]->NumberValue();
+
+    obj->_sg.reset( new skinGraphics() );
+    obj->_incis.reset( new incision() );
     trianglesUVW *_tuvw = obj->_sg->getTrianglesUVW();
     if(_tuvw->readObjFile(tempString.c_str()))
         Nan::ThrowError("Unable to load fixed uvwTriangle .obj input file-");

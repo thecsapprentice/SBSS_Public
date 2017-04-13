@@ -3,6 +3,7 @@
 
 #include <nan.h>
 #include <vector>
+#include <memory>
 
 class skinGraphics;
 class incision;
@@ -48,8 +49,8 @@ class Legacy_Cutter : public Nan::ObjectWrap {
 
   
   // Members
-  incision* _incis;
-  skinGraphics* _sg; 
+  std::unique_ptr<incision> _incis;
+  std::unique_ptr<skinGraphics> _sg; 
      
 };
 
